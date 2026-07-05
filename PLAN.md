@@ -3,7 +3,6 @@
 ## Instructions
 - Respect DESIGN.md 
 - Implement responsive design (mobile-first)
-- Keep design simple and clean, with a focus on usability
 
 ## Todo List
 
@@ -40,11 +39,10 @@
 
 ### Phase 3 — Authentication
 
-- [ ] Register `role` and `accountBalance` as `additionalFields` in `auth.ts`
-- [ ] Implement `sendMagicLink` callback using Resend
-- [ ] Add `RESEND_API_KEY` to `.env.example`
-- [ ] Update `env.d.ts` — type `App.Locals` with `user` (including `role`, `accountBalance`) and `session`
-- [ ] Update middleware:
+- [x] Implement `sendMagicLink` callback using Resend
+- [x] Add `RESEND_API_KEY` to `.env.example`
+- [x] Update `env.d.ts` — type `App.Locals` with `user` (including `role`, `accountBalance`) and `session`
+- [x] Update middleware:
   - Public routes: `/`, `/login`
   - Protected routes: `/dashboard` and all sub-paths
   - Admin-only routes: `/users`, `/transaction-categories`, `/import-transactions`, `/approve-transactions`
@@ -55,29 +53,29 @@
 
 ### Phase 4 — Core Business Logic (API Routes)
 
-- [ ] `recalculateBalances(userIds: string[])` helper — recomputes `accountBalance` from completed, non-deleted transactions and updates the `user` table
-- [ ] `POST /api/transactions/group` — create group transaction
+- [x] `recalculateBalances(userIds: string[])` helper — recomputes `accountBalance` from completed, non-deleted transactions and updates the `user` table
+- [x] `POST /api/transactions/group` — create group transaction
   - Validate session and input
   - Generate `transactionGroupId`
   - Split amount equally or by custom amounts (validate custom amounts sum to total)
   - Insert 1 deposit (paidBy, full amount) + N withdrawals (one per party including paidBy)
   - Status: `'completed'` for admin, `'pending'` for regular user
   - If completed, call `recalculateBalances`
-- [ ] `POST /api/transactions/single` — create single transaction (admin only)
-- [ ] `PATCH /api/transactions/group/[groupId]/status` — approve or reject group (admin only)
+- [x] `POST /api/transactions/single` — create single transaction (admin only)
+- [x] `PATCH /api/transactions/group/[groupId]/status` — approve or reject group (admin only)
   - Approve → set all to `'completed'`, call `recalculateBalances`
   - Reject → set all to `'cancelled'`
-- [ ] `DELETE /api/transactions/group/[groupId]` — soft-delete group (admin only)
+- [x] `DELETE /api/transactions/group/[groupId]` — soft-delete group (admin only)
   - If group was `'completed'`, reverse balance changes via `recalculateBalances`
-- [ ] `GET /api/categories` — list categories (paginated, server-side)
-- [ ] `POST /api/categories` — create category (admin only)
-- [ ] `PATCH /api/categories/[id]` — update category (admin only)
-- [ ] `DELETE /api/categories/[id]` — soft-delete category (admin only)
-- [ ] `GET /api/users` — list users (paginated, server-side, admin only)
-- [ ] `POST /api/users` — create user (admin only)
-- [ ] `PATCH /api/users/[id]` — update user (admin only)
-- [ ] `DELETE /api/users/[id]` — soft-delete user (admin only)
-- [ ] `POST /api/transactions/import` — bulk import (admin only)
+- [x] `GET /api/categories` — list categories (paginated, server-side)
+- [x] `POST /api/categories` — create category (admin only)
+- [x] `PATCH /api/categories/[id]` — update category (admin only)
+- [x] `DELETE /api/categories/[id]` — soft-delete category (admin only)
+- [x] `GET /api/users` — list users (paginated, server-side, admin only)
+- [x] `POST /api/users` — create user (admin only)
+- [x] `PATCH /api/users/[id]` — update user (admin only)
+- [x] `DELETE /api/users/[id]` — soft-delete user (admin only)
+- [x] `POST /api/transactions/import` — bulk import (admin only)
   - Accept CSV or JSON; parse against single transaction schema
   - Return per-row validation errors; reject partial imports
   - Bulk-insert in a DB transaction
@@ -89,26 +87,28 @@
 
 #### Layout & Shared
 
-- [ ] `src/layouts/Layout.astro` — nav bar, global CSS, conditional admin links
-- [ ] Nav bar with links: Home (`/dashboard`), Transactions (`/transactions`), and admin-only: Users, Categories, Import, Approve
-- [ ] Sign-out button in nav
+- [x] `src/layouts/Layout.astro` — nav bar, global CSS, conditional admin links
+- [x] Nav bar with links: Home (`/dashboard`), Transactions (`/transactions`), and admin-only: Users, Categories, Import, Approve
+- [x] Sign-out button in nav
 
 #### Landing & Auth
 
-- [ ] `/` — Landing page: explain what lets-talie is, links to sign in
-- [ ] `/login` — Magic link sign-in form (Vue component: `LoginForm.vue`)
+- [x] `/` — Landing page: explain what lets-talie is, links to sign in
+- [x] `/login` — Magic link sign-in form (Vue component: `LoginForm.vue`)
 
 #### Dashboard — `/dashboard`
 
-- [ ] Server-side: fetch session and `accountBalance`
-- [ ] Display balance (positive = group owes you, negative = you owe)
-- [ ] "Add Group Transaction" tab/section — `GroupTransactionForm.vue`
+- [x] Server-side: fetch session and `accountBalance`
+- [x] Display balance (positive = group owes you, negative = you owe)
+- [x] "Add Group Transaction" tab/section — `GroupTransactionForm.vue`
   - Fields: name, date, remarks, amount, paid by (dropdown), parties (multi-select), category (dropdown)
   - Per-party custom amount toggle; validation that custom amounts sum to total
   - Submits to `POST /api/transactions/group`
-- [ ] "Add Single Transaction" tab/section (admin only) — `SingleTransactionForm.vue`
+- [x] "Add Single Transaction" tab/section (admin only) — `SingleTransactionForm.vue`
   - Fields: name, date, remarks, amount, paid by, type, status, category
   - Submits to `POST /api/transactions/single`
+
+
 
 #### Transactions — `/transactions`
 

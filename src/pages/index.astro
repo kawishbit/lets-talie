@@ -1,11 +1,115 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Home">
+	<!-- HERO -->
+	<section
+		style="max-width: 1280px; margin: 0 auto; padding: 96px 48px 80px; text-align: center;"
+	>
+		<p
+			class="eyebrow"
+			style="opacity: 0.45; margin-bottom: 28px;"
+		>
+			Group expense tracker
+		</p>
+		<h1
+			style="font-size: clamp(3rem, 9vw, 86px); font-weight: 340; line-height: 1.00; letter-spacing: -1.72px; margin-bottom: 28px;"
+		>
+			Know who owes what.
+		</h1>
+		<p
+			style="font-size: 20px; font-weight: 330; line-height: 1.40; letter-spacing: -0.14px; opacity: 0.6; max-width: 440px; margin: 0 auto 40px;"
+		>
+			One running tab for your group — who paid, who owes, and how much.
+		</p>
+		<a href="/login" class="btn-primary">Get started</a>
+	</section>
+
+	<!-- NAVY COLOR BLOCK — How it works -->
+	<section
+		style="max-width: 1280px; margin: 0 auto 96px; padding: 0 48px;"
+	>
+		<div
+			style="background: var(--color-block-navy); color: var(--color-inverse-ink); border-radius: 24px; padding: 64px;"
+		>
+			<p
+				class="eyebrow"
+				style="color: #fff; opacity: 0.4; margin-bottom: 20px;"
+			>
+				How it works
+			</p>
+			<h2
+				style="font-size: clamp(1.75rem, 4vw, 52px); font-weight: 340; line-height: 1.10; letter-spacing: -0.96px; margin-bottom: 56px; max-width: 440px;"
+			>
+				Three steps,<br />zero spreadsheets.
+			</h2>
+			<div
+				style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 48px;"
+			>
+				{
+					[
+						{
+							n: "01",
+							title: "Log a group expense",
+							body: "One person paid — record who, who was there, and the total. lets-talie splits it automatically.",
+						},
+						{
+							n: "02",
+							title: "See your running balance",
+							body: "Your dashboard shows exactly how much the group owes you, or you owe. Updated after every transaction.",
+						},
+						{
+							n: "03",
+							title: "Settle up",
+							body: "When a debt is cleared, record the settlement. Balances reset and everyone's on the same page.",
+						},
+					].map(({ n, title, body }) => (
+						<div>
+							<p
+								class="eyebrow"
+								style="color: #fff; opacity: 0.35; margin-bottom: 12px;"
+							>
+								{n}
+							</p>
+							<h3
+								style="font-size: 18px; font-weight: 540; letter-spacing: -0.26px; line-height: 1.35; margin-bottom: 10px;"
+							>
+								{title}
+							</h3>
+							<p
+								style="font-size: 16px; font-weight: 330; line-height: 1.55; opacity: 0.5;"
+							>
+								{body}
+							</p>
+						</div>
+					))
+				}
+			</div>
+		</div>
+	</section>
+
+	<!-- LIME COLOR BLOCK — CTA -->
+	<section
+		style="max-width: 1280px; margin: 0 auto 96px; padding: 0 48px;"
+	>
+		<div
+			style="background: var(--color-block-lime); border-radius: 24px; padding: 64px;"
+		>
+			<p class="eyebrow" style="opacity: 0.5; margin-bottom: 20px;">
+				Ready to start?
+			</p>
+			<h2
+				style="font-size: clamp(1.75rem, 4vw, 48px); font-weight: 540; line-height: 1.10; letter-spacing: -0.96px; max-width: 400px; margin-bottom: 16px;"
+			>
+				Sign in. It takes ten seconds.
+			</h2>
+			<p
+				style="font-size: 16px; font-weight: 330; line-height: 1.55; opacity: 0.65; max-width: 340px; margin-bottom: 32px;"
+			>
+				No password needed — we'll send a magic link to your inbox.
+			</p>
+			<a href="/login" class="btn-primary">Sign in with email</a>
+		</div>
+	</section>
 </Layout>

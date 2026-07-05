@@ -1,8 +1,8 @@
 {
 	"version": "8",
 	"dialect": "postgres",
-	"id": "30ed672e-78c1-4a65-9df3-5260082271f9",
-	"prevIds": ["00000000-0000-0000-0000-000000000000"],
+	"id": "b83b14a5-983c-4fa3-bb7d-d05d273c2652",
+	"prevIds": ["30ed672e-78c1-4a65-9df3-5260082271f9"],
 	"ddl": [
 		{
 			"isRlsEnabled": false,
@@ -699,6 +699,19 @@
 			"generated": null,
 			"identity": null,
 			"name": "account_balance",
+			"entityType": "columns",
+			"schema": "public",
+			"table": "user"
+		},
+		{
+			"type": "timestamp",
+			"typeSchema": null,
+			"notNull": false,
+			"dimensions": 0,
+			"default": null,
+			"generated": null,
+			"identity": null,
+			"name": "deleted_at",
 			"entityType": "columns",
 			"schema": "public",
 			"table": "user"

@@ -1,0 +1,36 @@
+---
+import LoginForm from "../components/LoginForm.vue";
+import Layout from "../layouts/Layout.astro";
+
+// If already authenticated, redirect to dashboard
+if (Astro.locals.user) {
+	return Astro.redirect("/dashboard");
+}
+---
+
+<Layout title="Sign in">
+        <div
+                class="min-h-[calc(100vh-73px)] flex items-center justify-center px-6 py-16"
+        >
+                <div class="w-full max-w-sm">
+                        <div class="mb-8 text-center">
+                                <a
+                                        href="/"
+                                        class="inline-block font-semibold text-xl tracking-tight mb-6"
+                                        >lets-talie</a
+                                >
+                                <h1
+                                        class="text-2xl font-[540] tracking-[-0.02em] mb-2"
+                                >
+                                        Sign in
+                                </h1>
+                                <p
+                                        class="text-sm text-[--color-muted] font-[330]"
+                                >
+                                        We'll send a magic link to your email.
+                                </p>
+                        </div>
+                        <LoginForm client:load />
+                </div>
+        </div>
+</Layout>

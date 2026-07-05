@@ -1,22 +1,42 @@
-import { auth } from "@lib/auth"; // import your Better Auth instance
 import { defineMiddleware } from "astro:middleware";
+import { auth } from "@lib/auth";
+
+const PUBLIC_ROUTES = new Set(["/", "/login"]);
+const AUTH_API_PREFIX = "/api/auth";
+const ADMIN_ROUTES = [
+	"/users",
+	"/transaction-categories",
+	"/import-transactions",
+	"/approve-transactions",
+];
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  const isAuthed = await auth.api
-    .getSession({
-      headers: context.request.headers,
-    })
+	const { pathname } = context.url;
 
-  if (isAuthed) {
-      context.locals.user = isAuthed.user;
-      context.locals.session = isAuthed.session;
-  } else {
-      context.locals.user = null;
-      context.locals.session = null;
-  }
+	const session = await auth.api.getSession({
+		headers: context.request.headers,
+	});
 
-  if (context.url.pathname === "/dashboard" && !isAuthed) {
-    return context.redirect("/");
-  }
-  return next();
+	context.locals.user = session?.user ?? null;
+	context.locals.session = session?.session ?? null;
+
+	// Always allow public routes and auth API
+	if (PUBLIC_ROUTES.has(pathname) || pathname.startsWith(AUTH_API_PREFIX)) {
+		return next();
+	}
+
+	// Redirect unauthenticated users to /login
+	if (!session) {
+		return context.redirect("/login");
+	}
+
+	// Redirect non-admins away from admin-only routes
+	const isAdminRoute = ADMIN_ROUTES.some(
+		(route) => pathname === route || pathname.startsWith(route + "/"),
+	);
+	if (isAdminRoute && session.user.role !== "admin") {
+		return context.redirect("/dashboard");
+	}
+
+	return next();
 });
