@@ -1,0 +1,75 @@
+---
+import { asc, isNull, sql } from "drizzle-orm";
+import CategoryTable from "../components/CategoryTable.vue";
+import { db } from "../db/database";
+import { transactionCategories } from "../db/schema";
+import Layout from "../layouts/Layout.astro";
+
+if (!Astro.locals.user) {
+	return Astro.redirect("/login");
+}
+
+const PAGE_SIZE = 20;
+const page = Math.max(
+	1,
+	parseInt(Astro.url.searchParams.get("page") ?? "1", 10),
+);
+const offset = (page - 1) * PAGE_SIZE;
+
+const [items, [{ total }]] = await Promise.all([
+	db
+		.select({
+			id: transactionCategories.id,
+			label: transactionCategories.label,
+			remarks: transactionCategories.remarks,
+			createdAt: transactionCategories.createdAt,
+		})
+		.from(transactionCategories)
+		.where(isNull(transactionCategories.deletedAt))
+		.orderBy(asc(transactionCategories.label))
+		.limit(PAGE_SIZE)
+		.offset(offset),
+	db
+		.select({ total: sql<number>`COUNT(*)::int` })
+		.from(transactionCategories)
+		.where(isNull(transactionCategories.deletedAt)),
+]);
+
+const categoryItems = items.map((c) => ({
+	id: c.id,
+	label: c.label,
+	remarks: c.remarks ?? null,
+	createdAt: c.createdAt.toISOString(),
+}));
+---
+
+<Layout title="Categories">
+	<div class="max-w-screen-xl mx-auto px-6 py-10">
+		<!-- Header -->
+		<div class="mb-8">
+			<p
+				class="font-mono text-xs uppercase tracking-widest text-(--color-muted) mb-2"
+			>
+				Admin
+			</p>
+			<h1
+				class="text-[clamp(1.75rem,5vw,2.5rem)] font-[340] leading-none tracking-[-0.03em]"
+			>
+				Categories
+			</h1>
+			<p class="text-sm text-(--color-muted) font-[330] mt-2">
+				{total}&nbsp;{total === 1 ? "category" : "categories"}
+				total
+			</p>
+		</div>
+
+		<!-- Table -->
+		<CategoryTable
+			client:only="vue"
+			initialCategories={categoryItems}
+			initialTotal={total}
+			initialPage={page}
+			pageSize={PAGE_SIZE}
+		/>
+	</div>
+</Layout>

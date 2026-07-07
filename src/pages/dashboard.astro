@@ -4,7 +4,10 @@ import SingleTransactionForm from "../components/SingleTransactionForm.vue";
 import Layout from "../layouts/Layout.astro";
 import { fetchUsersAndCategories } from "../lib/queries";
 
-const currentUser = Astro.locals.user!;
+if (!Astro.locals.user) {
+	return Astro.redirect("/login");
+}
+const currentUser = Astro.locals.user;
 const isAdmin = currentUser.role === "admin";
 
 const { users, categories } = await fetchUsersAndCategories();
@@ -19,77 +22,70 @@ const balanceFormatted = new Intl.NumberFormat("en-US", {
 ---
 
 <Layout title="Dashboard">
-        <div class="max-w-screen-xl mx-auto px-6 py-10">
-                <!-- Balance block -->
-                <section class="mb-10">
-                        <div
-                                class:list={[
+	<div class="max-w-screen-xl mx-auto px-6 py-10">
+		<!-- Balance block -->
+		<section class="mb-10">
+			<div
+				class:list={[
                                         "rounded-3xl px-8 py-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4",
                                         balancePositive
-                                                ? "bg-[--color-block-lime]"
-                                                : "bg-[--color-block-coral]",
+                                                ? "bg-(--color-block-lime)"
+                                                : "bg-(--color-block-coral)",
                                 ]}
-                        >
-                                <div>
-                                        <p
-                                                class="font-mono text-xs uppercase tracking-widest text-[--color-muted] mb-2"
-                                        >
-                                                Your balance
-                                        </p>
-                                        <p
-                                                class="text-[clamp(2.5rem,8vw,4rem)] font-[340] leading-none tracking-[-0.03em]"
-                                        >
-                                                {balanceFormatted}
-                                        </p>
-                                </div>
-                                <div
-                                        class="text-sm text-[--color-muted] font-[330] max-w-xs"
-                                >
-                                        {
-                                                balancePositive
+			>
+				<div>
+					<p
+						class="font-mono text-xs uppercase tracking-widest text-(--color-muted) mb-2"
+					>
+						Your balance
+					</p>
+					<p
+						class="text-[clamp(2.5rem,8vw,4rem)] font-[340] leading-none tracking-[-0.03em]"
+					>
+						{balanceFormatted}
+					</p>
+				</div>
+				<div class="text-sm text-(--color-muted) font-[330] max-w-xs">
+					{balancePositive
                                                         ? "The group owes you this amount overall."
-                                                        : "You owe this amount to the group overall."
-                                        }
-                                </div>
-                        </div>
-                </section>
+                                                        : "You owe this amount to the group overall."}
+				</div>
+			</div>
+		</section>
 
-                <!-- Transaction forms -->
-                <section>
-                        <h2 class="text-xl font-[540] tracking-[-0.02em] mb-6">
-                                Add a transaction
-                        </h2>
-                        <div
-                                class:list={[
+		<!-- Transaction forms -->
+		<section>
+			<h2 class="text-xl font-[540] tracking-[-0.02em] mb-6">
+				Add a transaction
+			</h2>
+			<div
+				class:list={[
                                         "grid gap-6",
                                         isAdmin ? "lg:grid-cols-2" : "",
                                 ]}
-                        >
-                                <!-- Group Transaction Form -->
-                                <div
-                                        class="border border-[--color-hairline] rounded-2xl p-6"
-                                >
-                                        <p
-                                                class="font-mono text-xs uppercase tracking-widest text-[--color-muted] mb-1"
-                                        >
-                                                Group
-                                        </p>
-                                        <h3 class="font-[540] text-base mb-5">
-                                                Split between multiple people
-                                        </h3>
-                                        <GroupTransactionForm
-                                                client:load
-                                                users={users}
-                                                categories={categories}
-                                                currentUserId={currentUser.id}
-                                        />
-                                </div>
+			>
+				<!-- Group Transaction Form -->
+				<div class="border border-(--color-hairline) rounded-2xl p-6">
+					<p
+						class="font-mono text-xs uppercase tracking-widest text-(--color-muted) mb-1"
+					>
+						Group
+					</p>
+					<h3 class="font-[540] text-base mb-5">
+						Split between multiple people
+					</h3>
+					<GroupTransactionForm
+						client:load
+						users={users}
+						categories={categories}
+						currentUserId={currentUser.id}
+					/>
+				</div>
 
-                                <!-- Single Transaction Form (admin only) -->
-                                {
-                                        isAdmin && (
-                                                <div class="border border-[--color-hairline] rounded-2xl p-6">
-                                                        <p class="font-mono text-xs uppercase tracking-widest text-[--color-muted] mb-1">
+				<!-- Single Transaction Form (admin only) -->
+				{isAdmin && (
+                                                <div class="border border-(--color-hairline) rounded-2xl p-6">
+                                                        <p class="font-mono text-xs uppercase tracking-widest text-(--color-muted) mb-1">
                                                                 Single
                                                         </p>
                                                         <h3 class="font-[540] text-base mb-5">
@@ -105,9 +101,8 @@ const balanceFormatted = new Intl.NumberFormat("en-US", {
                                                                 }
                                                         />
                                                 </div>
-                                        )
-                                }
-                        </div>
-                </section>
-        </div>
+                                        )}
+			</div>
+		</section>
+	</div>
 </Layout>

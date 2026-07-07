@@ -1,7 +1,7 @@
 import { db } from "@db/database";
 import { user } from "@db/schema";
 import type { APIRoute } from "astro";
-import { asc, isNull, sql } from "drizzle-orm";
+import { and, asc, eq, isNull, sql } from "drizzle-orm";
 
 const DEFAULT_PAGE_SIZE = 20;
 
@@ -27,6 +27,13 @@ export const GET: APIRoute = async ({ locals, url }) => {
 		),
 	);
 	const offset = (page - 1) * pageSize;
+	const roleParam = url.searchParams.get("role");
+	const roleFilter =
+		roleParam === "admin" || roleParam === "user" ? roleParam : null;
+
+	const whereClause = roleFilter
+		? and(isNull(user.deletedAt), eq(user.role, roleFilter))
+		: isNull(user.deletedAt);
 
 	const [items, [{ total }]] = await Promise.all([
 		db
@@ -41,7 +48,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
 				deletedAt: user.deletedAt,
 			})
 			.from(user)
-			.where(isNull(user.deletedAt))
+			.where(whereClause)
 			.orderBy(asc(user.name))
 			.limit(pageSize)
 			.offset(offset),
@@ -49,7 +56,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
 		db
 			.select({ total: sql<number>`COUNT(*)::int` })
 			.from(user)
-			.where(isNull(user.deletedAt)),
+			.where(whereClause),
 	]);
 
 	return Response.json({ items, total, page, pageSize });

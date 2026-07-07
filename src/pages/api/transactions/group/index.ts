@@ -63,7 +63,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 	}
 
 	const txDate = new Date(date);
-	if (isNaN(txDate.getTime())) {
+	if (Number.isNaN(txDate.getTime())) {
 		return Response.json({ error: "Invalid date format" }, { status: 400 });
 	}
 
@@ -72,12 +72,12 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 	if (body.customAmounts) {
 		const sum = parties.reduce((acc, uid) => {
-			const v = body.customAmounts![uid];
+			const v = body.customAmounts?.[uid];
 			if (typeof v !== "number" || v < 0) return NaN;
 			return acc + v;
 		}, 0);
 
-		if (isNaN(sum) || Math.abs(sum - amount) > 0.01) {
+		if (Number.isNaN(sum) || Math.abs(sum - amount) > 0.01) {
 			return Response.json(
 				{ error: "Custom amounts must sum to the total amount" },
 				{ status: 400 },
@@ -86,7 +86,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 
 		splits = parties.map((uid) => ({
 			userId: uid,
-			amount: body.customAmounts![uid].toFixed(2),
+			amount: (body.customAmounts?.[uid] ?? 0).toFixed(2),
 		}));
 	} else {
 		const perPerson = (amount / parties.length).toFixed(2);

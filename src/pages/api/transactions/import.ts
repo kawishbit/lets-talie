@@ -65,13 +65,13 @@ function validateRows(rows: ImportRow[]): {
 		}
 
 		const txDate = row.date ? new Date(row.date) : null;
-		if (!txDate || isNaN(txDate.getTime())) {
+		if (!txDate || Number.isNaN(txDate.getTime())) {
 			rowErrors.push("date must be a valid date string");
 		}
 
 		const amount =
 			typeof row.amount === "string" ? parseFloat(row.amount) : row.amount;
-		if (isNaN(amount) || amount <= 0) {
+		if (Number.isNaN(amount) || amount <= 0) {
 			rowErrors.push("amount must be a positive number");
 		}
 
@@ -92,7 +92,7 @@ function validateRows(rows: ImportRow[]): {
 		} else {
 			validRows.push({
 				name: String(row.name).trim(),
-				date: txDate!,
+				date: txDate as Date,
 				remarks: row.remarks?.trim() || null,
 				amount: amount.toFixed(2),
 				paidByUserId: String(row.paidByUserId).trim(),

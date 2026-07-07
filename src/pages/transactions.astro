@@ -1,0 +1,123 @@
+---
+import { and, desc, eq, isNull, sql } from "drizzle-orm";
+import TransactionTable from "../components/TransactionTable.vue";
+import { db } from "../db/database";
+import { transactionCategories, transactions, user } from "../db/schema";
+import Layout from "../layouts/Layout.astro";
+
+if (!Astro.locals.user) {
+	return Astro.redirect("/login");
+}
+const currentUser = Astro.locals.user;
+const isAdmin = currentUser.role === "admin";
+
+const PAGE_SIZE = 25;
+const page = Math.max(
+	1,
+	parseInt(Astro.url.searchParams.get("page") ?? "1", 10),
+);
+const offset = (page - 1) * PAGE_SIZE;
+
+// Admins see all rows (including deleted, shown greyed out); regular users see only their own non-deleted rows
+const whereClause = isAdmin
+	? undefined
+	: and(
+			eq(transactions.paidByUserId, currentUser.id),
+			isNull(transactions.deletedAt),
+		);
+
+const [items, [{ total }], categories] = await Promise.all([
+	db
+		.select({
+			id: transactions.id,
+			transactionGroupId: transactions.transactionGroupId,
+			name: transactions.name,
+			date: transactions.date,
+			remarks: transactions.remarks,
+			amount: transactions.amount,
+			type: transactions.type,
+			status: transactions.status,
+			paidByUserId: transactions.paidByUserId,
+			paidByUserName: user.name,
+			categoryId: transactions.categoryId,
+			categoryLabel: transactionCategories.label,
+			createdAt: transactions.createdAt,
+			deletedAt: transactions.deletedAt,
+		})
+		.from(transactions)
+		.leftJoin(user, eq(transactions.paidByUserId, user.id))
+		.leftJoin(
+			transactionCategories,
+			eq(transactions.categoryId, transactionCategories.id),
+		)
+		.where(whereClause ?? isNull(transactions.deletedAt))
+		.orderBy(desc(transactions.date))
+		.limit(PAGE_SIZE)
+		.offset(offset),
+
+	db
+		.select({ total: sql<number>`COUNT(*)::int` })
+		.from(transactions)
+		.where(whereClause ?? isNull(transactions.deletedAt)),
+
+	db
+		.select({
+			id: transactionCategories.id,
+			label: transactionCategories.label,
+		})
+		.from(transactionCategories)
+		.where(isNull(transactionCategories.deletedAt))
+		.orderBy(transactionCategories.label),
+]);
+
+const txItems = items.map((t) => ({
+	id: t.id,
+	transactionGroupId: t.transactionGroupId,
+	name: t.name,
+	date: t.date.toISOString(),
+	remarks: t.remarks ?? null,
+	amount: t.amount,
+	type: t.type as "deposit" | "withdrawal",
+	status: t.status as "pending" | "completed" | "cancelled",
+	paidByUserId: t.paidByUserId,
+	paidByUserName: t.paidByUserName ?? null,
+	categoryId: t.categoryId ?? null,
+	categoryLabel: t.categoryLabel ?? null,
+	createdAt: t.createdAt.toISOString(),
+	deletedAt: t.deletedAt?.toISOString() ?? null,
+}));
+---
+
+<Layout title="Transactions">
+	<div class="max-w-screen-xl mx-auto px-6 py-10">
+		<!-- Header -->
+		<div class="mb-8">
+			<p
+				class="font-mono text-xs uppercase tracking-widest text-(--color-muted) mb-2"
+			>
+				{isAdmin ? "All" : "My"}
+			</p>
+			<h1
+				class="text-[clamp(1.75rem,5vw,2.5rem)] font-[340] leading-none tracking-[-0.03em]"
+			>
+				Transactions
+			</h1>
+			<p class="text-sm text-(--color-muted) font-[330] mt-2">
+				{total}&nbsp;{total === 1
+                                                ? "transaction"
+                                                : "transactions"}
+				total
+			</p>
+		</div>
+
+		<TransactionTable
+			client:only="vue"
+			initialItems={txItems}
+			initialTotal={total}
+			initialPage={page}
+			pageSize={PAGE_SIZE}
+			isAdmin={isAdmin}
+			categories={categories}
+		/>
+	</div>
+</Layout>

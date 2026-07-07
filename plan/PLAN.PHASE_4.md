@@ -1,0 +1,29 @@
+# Phase 4 — Core Business Logic (API Routes)
+
+- [x] `recalculateBalances(userIds: string[])` helper — recomputes `accountBalance` from completed, non-deleted transactions and updates the `user` table
+- [x] `POST /api/transactions/group` — create group transaction
+  - Validate session and input
+  - Generate `transactionGroupId`
+  - Split amount equally or by custom amounts (validate custom amounts sum to total)
+  - Insert 1 deposit (paidBy, full amount) + N withdrawals (one per party including paidBy)
+  - Status: `'completed'` for admin, `'pending'` for regular user
+  - If completed, call `recalculateBalances`
+- [x] `POST /api/transactions/single` — create single transaction (admin only)
+- [x] `PATCH /api/transactions/group/[groupId]/status` — approve or reject group (admin only)
+  - Approve → set all to `'completed'`, call `recalculateBalances`
+  - Reject → set all to `'cancelled'`
+- [x] `DELETE /api/transactions/group/[groupId]` — soft-delete group (admin only)
+  - If group was `'completed'`, reverse balance changes via `recalculateBalances`
+- [x] `GET /api/categories` — list categories (paginated, server-side)
+- [x] `POST /api/categories` — create category (admin only)
+- [x] `PATCH /api/categories/[id]` — update category (admin only)
+- [x] `DELETE /api/categories/[id]` — soft-delete category (admin only)
+- [x] `GET /api/users` — list users (paginated, server-side, admin only)
+- [x] `POST /api/users` — create user (admin only)
+- [x] `PATCH /api/users/[id]` — update user (admin only)
+- [x] `DELETE /api/users/[id]` — soft-delete user (admin only)
+- [x] `POST /api/transactions/import` — bulk import (admin only)
+  - Accept CSV or JSON; parse against single transaction schema
+  - Return per-row validation errors; reject partial imports
+  - Bulk-insert in a DB transaction
+  - Call `recalculateBalances` for all affected users after import

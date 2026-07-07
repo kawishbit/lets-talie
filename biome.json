@@ -5,6 +5,13 @@
 			"tailwindDirectives": true
 		}
 	},
+	"html": {
+		"experimentalFullSupportEnabled": true,
+		"formatter": {
+			"enabled": true,
+			"indentScriptAndStyle": true
+		}
+	},
 	"vcs": {
 		"enabled": true,
 		"clientKind": "git",

@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-import SignOutButton from "../components/SignOutButton.vue";
+import AppHeader from "../components/AppHeader.astro";
 
 interface Props {
 	title?: string;
@@ -9,133 +9,35 @@ interface Props {
 const { title } = Astro.props;
 const pageTitle = title ? `${title} — lets-talie` : "lets-talie";
 const currentUser = Astro.locals.user;
-const isAdmin = currentUser?.role === "admin";
 const pathname = new URL(Astro.request.url).pathname;
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1"
-		/>
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+		<link rel="icon" href="/favicon.ico">
+		<meta name="generator" content={Astro.generator}>
 		<title>{pageTitle}</title>
+		<script is:inline>
+			// Apply saved theme before CSS loads to prevent flash
+			(() => {
+				var saved = localStorage.getItem("theme");
+				var prefersDark = window.matchMedia(
+					"(prefers-color-scheme: dark)",
+				).matches;
+				if (saved === "dark" || (!saved && prefersDark)) {
+					document.documentElement.setAttribute("data-theme", "dark");
+				} else if (saved === "light") {
+					document.documentElement.setAttribute("data-theme", "light");
+				}
+			})();
+		</script>
 	</head>
-	<body class="min-h-screen bg-[--color-canvas] text-[--color-ink]">
-		{
-			currentUser && (
-				<header class="border-b border-[--color-hairline] sticky top-0 bg-[--color-canvas] z-50">
-					<nav class="max-w-screen-xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
-						<div class="flex items-center gap-8">
-							<a
-								href="/dashboard"
-								class="font-semibold text-[17px] tracking-tight leading-none select-none"
-							>
-								lets-talie
-							</a>
-							<div class="hidden sm:flex items-center gap-1">
-								<a
-									href="/dashboard"
-									class:list={[
-										"px-3 py-1.5 rounded-full text-sm transition-colors",
-										pathname ===
-										"/dashboard"
-											? "bg-[--color-ink] text-white"
-											: "hover:bg-[--color-surface]",
-									]}
-								>
-									Dashboard
-								</a>
-								<a
-									href="/transactions"
-									class:list={[
-										"px-3 py-1.5 rounded-full text-sm transition-colors",
-										pathname.startsWith(
-											"/transactions",
-										)
-											? "bg-[--color-ink] text-white"
-											: "hover:bg-[--color-surface]",
-									]}
-								>
-									Transactions
-								</a>
-								{isAdmin && (
-									<>
-										<a
-											href="/users"
-											class:list={[
-												"px-3 py-1.5 rounded-full text-sm transition-colors",
-												pathname.startsWith(
-													"/users",
-												)
-													? "bg-[--color-ink] text-white"
-													: "hover:bg-[--color-surface]",
-											]}
-										>
-											Users
-										</a>
-										<a
-											href="/transaction-categories"
-											class:list={[
-												"px-3 py-1.5 rounded-full text-sm transition-colors",
-												pathname.startsWith(
-													"/transaction-categories",
-												)
-													? "bg-[--color-ink] text-white"
-													: "hover:bg-[--color-surface]",
-											]}
-										>
-											Categories
-										</a>
-										<a
-											href="/import-transactions"
-											class:list={[
-												"px-3 py-1.5 rounded-full text-sm transition-colors",
-												pathname.startsWith(
-													"/import-transactions",
-												)
-													? "bg-[--color-ink] text-white"
-													: "hover:bg-[--color-surface]",
-											]}
-										>
-											Import
-										</a>
-										<a
-											href="/approve-transactions"
-											class:list={[
-												"px-3 py-1.5 rounded-full text-sm transition-colors",
-												pathname.startsWith(
-													"/approve-transactions",
-												)
-													? "bg-[--color-ink] text-white"
-													: "hover:bg-[--color-surface]",
-											]}
-										>
-											Approve
-										</a>
-									</>
-								)}
-							</div>
-						</div>
-						<div class="flex items-center gap-3">
-							<span class="hidden sm:block text-sm text-[--color-muted] truncate max-w-[200px]">
-								{
-									currentUser.email
-								}
-							</span>
-							<SignOutButton
-								client:load
-							/>
-						</div>
-					</nav>
-				</header>
-			)
-		}
+	<body class="min-h-screen bg-(--color-canvas) text-(--color-ink)">
+		<AppHeader user={currentUser} pathname={pathname} />
 		<main>
 			<slot />
 		</main>

@@ -57,7 +57,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 	}
 
 	const txDate = new Date(date);
-	if (isNaN(txDate.getTime())) {
+	if (Number.isNaN(txDate.getTime())) {
 		return Response.json({ error: "Invalid date format" }, { status: 400 });
 	}
 

@@ -17,7 +17,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		headers: context.request.headers,
 	});
 
-	context.locals.user = session?.user ?? null;
+	context.locals.user = session?.user
+		? {
+				...session.user,
+				role: session.user.role ?? null,
+				accountBalance: session.user.accountBalance ?? null,
+			}
+		: null;
 	context.locals.session = session?.session ?? null;
 
 	// Always allow public routes and auth API
@@ -32,7 +38,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
 	// Redirect non-admins away from admin-only routes
 	const isAdminRoute = ADMIN_ROUTES.some(
-		(route) => pathname === route || pathname.startsWith(route + "/"),
+		(route) => pathname === route || pathname.startsWith(`${route}/`),
 	);
 	if (isAdminRoute && session.user.role !== "admin") {
 		return context.redirect("/dashboard");

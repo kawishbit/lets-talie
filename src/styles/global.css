@@ -5,16 +5,113 @@
 	--font-sans: "Inter", system-ui, -apple-system, sans-serif;
 	--font-mono: "JetBrains Mono", "SF Mono", Menlo, monospace;
 
+	/* Core palette */
 	--color-ink: #0a0a0a;
 	--color-canvas: #ffffff;
 	--color-surface: #f5f5f5;
 	--color-hairline: #e8e8e8;
 	--color-muted: #737373;
+	--color-label: #525252;
+	--color-subtle: #a3a3a3;
+	--color-faint: #fafafa;
 
+	/* Block colors */
 	--color-block-lime: #e4f5d4;
 	--color-block-coral: #ffe4d8;
 	--color-block-cream: #faf7f0;
 	--color-block-mint: #d4f0e8;
+
+	/* Modal & inputs */
+	--color-modal-bg: #ffffff;
+	--color-modal-scrim: rgba(0, 0, 0, 0.4);
+	--color-input-bg: #ffffff;
+
+	/* Status badges */
+	--color-badge-completed-bg: #d4f0e8;
+	--color-badge-completed-text: #0a6047;
+	--color-badge-pending-bg: #faf7f0;
+	--color-badge-pending-text: #7c5e0a;
+	--color-badge-positive-bg: #e4f5d4;
+	--color-badge-positive-text: #1a5c00;
+	--color-badge-negative-bg: #ffe4d8;
+	--color-badge-negative-text: #8b2500;
+
+	/* Errors */
+	--color-error-bg: #fff0f0;
+	--color-error-border: #fecaca;
+	--color-error-text: #b91c1c;
+}
+
+/* ── Dark mode ─────────────────────────────────────────────────────────────── */
+/* Applied via media query unless the user has explicitly chosen a theme.       */
+/* The data-theme attribute (set by the toggle + localStorage) takes precedence.*/
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		--color-ink: #f0f0f0;
+		--color-canvas: #0d0d0d;
+		--color-surface: #1c1c1c;
+		--color-hairline: #2a2a2a;
+		--color-muted: #a3a3a3;
+		--color-label: #a3a3a3;
+		--color-subtle: #6b6b6b;
+		--color-faint: #141414;
+
+		--color-block-lime: #1a2e14;
+		--color-block-coral: #2e1710;
+		--color-block-cream: #1e1c18;
+		--color-block-mint: #102a22;
+
+		--color-modal-bg: #1a1a1a;
+		--color-modal-scrim: rgba(0, 0, 0, 0.6);
+		--color-input-bg: #111111;
+
+		--color-badge-completed-bg: #102a22;
+		--color-badge-completed-text: #6ee7b7;
+		--color-badge-pending-bg: #2a2318;
+		--color-badge-pending-text: #fcd34d;
+		--color-badge-positive-bg: #1a2e14;
+		--color-badge-positive-text: #86efac;
+		--color-badge-negative-bg: #2e1710;
+		--color-badge-negative-text: #fb923c;
+
+		--color-error-bg: #2e1212;
+		--color-error-border: #7f1d1d;
+		--color-error-text: #fca5a5;
+	}
+}
+
+:root[data-theme="dark"] {
+	--color-ink: #f0f0f0;
+	--color-canvas: #0d0d0d;
+	--color-surface: #1c1c1c;
+	--color-hairline: #2a2a2a;
+	--color-muted: #a3a3a3;
+	--color-label: #a3a3a3;
+	--color-subtle: #6b6b6b;
+	--color-faint: #141414;
+
+	--color-block-lime: #1a2e14;
+	--color-block-coral: #2e1710;
+	--color-block-cream: #1e1c18;
+	--color-block-mint: #102a22;
+
+	--color-modal-bg: #1a1a1a;
+	--color-modal-scrim: rgba(0, 0, 0, 0.6);
+	--color-input-bg: #111111;
+
+	--color-badge-completed-bg: #102a22;
+	--color-badge-completed-text: #6ee7b7;
+	--color-badge-pending-bg: #2a2318;
+	--color-badge-pending-text: #fcd34d;
+	--color-badge-positive-bg: #1a2e14;
+	--color-badge-positive-text: #86efac;
+	--color-badge-negative-bg: #2e1710;
+	--color-badge-negative-text: #fb923c;
+
+	--color-error-bg: #2e1212;
+	--color-error-border: #7f1d1d;
+	--color-error-text: #fca5a5;
 }
 
 * {

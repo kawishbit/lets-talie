@@ -1,0 +1,83 @@
+---
+import { asc, isNull, sql } from "drizzle-orm";
+import UserTable from "../components/UserTable.vue";
+import { db } from "../db/database";
+import { user } from "../db/schema";
+import Layout from "../layouts/Layout.astro";
+
+if (!Astro.locals.user) {
+	return Astro.redirect("/login");
+}
+const currentUser = Astro.locals.user;
+
+const PAGE_SIZE = 20;
+const page = Math.max(
+	1,
+	parseInt(Astro.url.searchParams.get("page") ?? "1", 10),
+);
+const offset = (page - 1) * PAGE_SIZE;
+
+const [items, [{ total }]] = await Promise.all([
+	db
+		.select({
+			id: user.id,
+			name: user.name,
+			email: user.email,
+			role: user.role,
+			accountBalance: user.accountBalance,
+			createdAt: user.createdAt,
+			deletedAt: user.deletedAt,
+		})
+		.from(user)
+		.where(isNull(user.deletedAt))
+		.orderBy(asc(user.name))
+		.limit(PAGE_SIZE)
+		.offset(offset),
+	db
+		.select({ total: sql<number>`COUNT(*)::int` })
+		.from(user)
+		.where(isNull(user.deletedAt)),
+]);
+
+const userItems = items.map((u) => ({
+	id: u.id,
+	name: u.name,
+	email: u.email,
+	role: (u.role ?? "user") as "user" | "admin",
+	accountBalance: u.accountBalance ?? "0.00",
+	createdAt: u.createdAt.toISOString(),
+	deletedAt: u.deletedAt?.toISOString() ?? null,
+}));
+---
+
+<Layout title="Users">
+	<div class="max-w-screen-xl mx-auto px-6 py-10">
+		<!-- Header -->
+		<div class="mb-8">
+			<p
+				class="font-mono text-xs uppercase tracking-widest text-(--color-muted) mb-2"
+			>
+				Admin
+			</p>
+			<h1
+				class="text-[clamp(1.75rem,5vw,2.5rem)] font-[340] leading-none tracking-[-0.03em]"
+			>
+				Users
+			</h1>
+			<p class="text-sm text-(--color-muted) font-[330] mt-2">
+				{total}&nbsp;{total === 1 ? "user" : "users"}
+				total
+			</p>
+		</div>
+
+		<!-- Table -->
+		<UserTable
+			client:only="vue"
+			initialUsers={userItems}
+			initialTotal={total}
+			initialPage={page}
+			pageSize={PAGE_SIZE}
+			currentUserId={currentUser.id}
+		/>
+	</div>
+</Layout>
