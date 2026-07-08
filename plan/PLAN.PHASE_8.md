@@ -40,19 +40,24 @@ The testing strategy is **unit-first**: isolate and test each piece of business 
 
 ## 8e — Utilities: `src/utils/nav.ts`
 
-- [ ] `navClass` — returns active classes when `currentPath` matches `href` exactly
-- [ ] `navClass` — returns active classes when `currentPath` is a sub-path of `href`
-- [ ] `navClass` — returns inactive classes when `currentPath` does not match
-- [ ] `navClass` — does not mark `/` as active when `currentPath` is `/dashboard`
+`navClass(active: boolean)` accepts a pre-computed boolean and returns a class list array.
+
+- [ ] `navClass(true)` — includes `bg-ink` and `text-canvas` in the returned array
+- [ ] `navClass(false)` — includes `hover:bg-surface` and does **not** include `bg-ink` or `text-canvas`
+- [ ] Both results include the shared base classes (`px-3`, `py-1.5`, `rounded-full`, `text-sm`, `transition-colors`)
 
 ## 8f — API Route: `POST /api/transactions/group` (`src/pages/api/transactions/group/index.ts`)
 
+Required body fields: `name`, `date`, `amount` (number), `paidByUserId`, `parties` (array). Optional: `remarks`, `categoryId`, `customAmounts`.
+
 - [ ] Returns `401` when no session exists
-- [ ] Returns `400` when required fields are missing (name, date, amount, paidBy, parties)
+- [ ] Returns `400` when required fields are missing (name, date, amount, paidByUserId, parties)
 - [ ] Returns `400` when `amount` is not a positive number
 - [ ] Returns `400` when `parties` is an empty array
+- [ ] Returns `400` when `paidByUserId` is not included in `parties`
+- [ ] Returns `400` when date string is not a valid date
 - [ ] Returns `400` when custom amounts do not sum to total amount
-- [ ] Returns `400` when custom amounts are provided but do not cover all parties
+- [ ] Returns `400` when a custom amount for any party is negative
 - [ ] Inserts 1 deposit + N withdrawals for N parties (equal split)
 - [ ] Inserts 1 deposit + N withdrawals for N parties (custom amounts)
 - [ ] Sets status `'completed'` when session user is admin
@@ -60,31 +65,37 @@ The testing strategy is **unit-first**: isolate and test each piece of business 
 - [ ] Calls `recalculateBalances` after insert when status is `'completed'`
 - [ ] Does not call `recalculateBalances` when status is `'pending'`
 - [ ] All inserted transactions share the same `transactionGroupId`
-- [ ] Returns `201` with the created group on success
+- [ ] Returns `201` with `{ id: groupId }` on success
 
 ## 8g — API Route: `POST /api/transactions/single` (`src/pages/api/transactions/single.ts`)
 
+Any authenticated user (not admin-only) can create a single transaction. Required body fields: `name`, `date`, `amount` (number), `paidByUserId`, `type`, `status`.
+
 - [ ] Returns `401` when no session exists
-- [ ] Returns `403` when session user is not admin
-- [ ] Returns `400` when required fields are missing
+- [ ] Returns `400` when required fields are missing (name, date, amount, paidByUserId, type, status)
 - [ ] Returns `400` when `amount` is not a positive number
 - [ ] Returns `400` when `type` is not `'deposit'` or `'withdrawal'`
-- [ ] Returns `400` when `status` is not a valid enum value
+- [ ] Returns `400` when `status` is not `'pending'`, `'completed'`, or `'cancelled'`
+- [ ] Returns `400` when date string is not a valid date
 - [ ] Inserts a single transaction record on valid input
-- [ ] Calls `recalculateBalances` after insert
-- [ ] Returns `201` with the created transaction on success
+- [ ] Calls `recalculateBalances` only when `status` is `'completed'`
+- [ ] Does not call `recalculateBalances` when `status` is `'pending'` or `'cancelled'`
+- [ ] Returns `201` with `{ id }` on success
 
 ## 8h — API Route: `PATCH /api/transactions/group/[groupId]/status` (`src/pages/api/transactions/group/[groupId]/status.ts`)
 
+Body field is `action: 'approve' | 'reject'` (not `status`).
+
 - [ ] Returns `401` when no session exists
 - [ ] Returns `403` when session user is not admin
-- [ ] Returns `400` when `status` is not `'completed'` or `'cancelled'`
-- [ ] Returns `404` when `groupId` does not exist
-- [ ] Sets all group transactions to `'completed'` on approve
-- [ ] Sets all group transactions to `'cancelled'` on reject
-- [ ] Calls `recalculateBalances` for all affected users on approve
-- [ ] Does not call `recalculateBalances` on reject
-- [ ] Returns `200` with updated group on success
+- [ ] Returns `400` when `action` is not `'approve'` or `'reject'`
+- [ ] Returns `404` when `groupId` does not exist (no non-deleted transactions found)
+- [ ] Returns `409` when the group has no pending transactions to update
+- [ ] Sets all group transactions to `'completed'` when `action` is `'approve'`
+- [ ] Sets all group transactions to `'cancelled'` when `action` is `'reject'`
+- [ ] Calls `recalculateBalances` for all affected users when approved
+- [ ] Does not call `recalculateBalances` when rejected
+- [ ] Returns `200` with `{ groupId, status }` on success
 
 ## 8i — API Route: `DELETE /api/transactions/group/[groupId]` (`src/pages/api/transactions/group/[groupId]/index.ts`)
 
@@ -100,9 +111,12 @@ The testing strategy is **unit-first**: isolate and test each piece of business 
 
 - [ ] Returns `401` when no session exists
 - [ ] Returns `403` when session user is not admin
-- [ ] Returns `400` when file is missing or unsupported format
-- [ ] Returns `400` with per-row errors when CSV rows fail validation
-- [ ] Returns `400` with per-row errors when JSON rows fail validation
+- [ ] Returns `415` when Content-Type is not `application/json`, `text/csv`, or `multipart/form-data`
+- [ ] Returns `400` when JSON body is not an array
+- [ ] Returns `400` when no rows are provided (empty file/array)
+- [ ] Returns `400` when the `file` field is missing from a `multipart/form-data` request
+- [ ] Returns `422` with per-row errors when CSV rows fail validation
+- [ ] Returns `422` with per-row errors when JSON rows fail validation
 - [ ] Rejects the entire import when any row has a validation error (no partial insert)
 - [ ] Bulk-inserts all rows inside a DB transaction on valid input
 - [ ] Calls `recalculateBalances` for all unique affected users after import
@@ -119,12 +133,14 @@ The testing strategy is **unit-first**: isolate and test each piece of business 
 - [ ] `PATCH /api/categories/[id]` — returns `404` when id does not exist
 - [ ] `PATCH /api/categories/[id]` — updates and returns `200` on valid input
 - [ ] `DELETE /api/categories/[id]` — returns `403` when not admin
+- [ ] `DELETE /api/categories/[id]` — returns `404` when id does not exist
 - [ ] `DELETE /api/categories/[id]` — sets `deletedAt` (soft-delete) and returns `200`
 
 ## 8l — API Routes: Users (`src/pages/api/users/`)
 
 - [ ] `GET /api/users` — returns `403` when not admin
 - [ ] `GET /api/users` — returns paginated list, excludes soft-deleted
+- [ ] `GET /api/users` — filters by role when `?role=admin` or `?role=user` is provided
 - [ ] `POST /api/users` — returns `403` when not admin
 - [ ] `POST /api/users` — returns `400` when `email` or `name` is missing
 - [ ] `POST /api/users` — returns `409` when email already exists
@@ -133,6 +149,8 @@ The testing strategy is **unit-first**: isolate and test each piece of business 
 - [ ] `PATCH /api/users/[id]` — returns `404` when id does not exist
 - [ ] `PATCH /api/users/[id]` — updates and returns `200` on valid input
 - [ ] `DELETE /api/users/[id]` — returns `403` when not admin
+- [ ] `DELETE /api/users/[id]` — returns `400` when attempting to delete own account
+- [ ] `DELETE /api/users/[id]` — returns `404` when id does not exist
 - [ ] `DELETE /api/users/[id]` — sets `deletedAt` and returns `200`
 
 ## 8m — Middleware: `src/middleware.ts`
