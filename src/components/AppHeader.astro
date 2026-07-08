@@ -9,103 +9,285 @@ interface Props {
 }
 
 const { user, pathname } = Astro.props;
-if (!user) return new Response(null, { status: 200 });
-
-const { email } = user;
-const isAdmin = user.role === "admin";
+const isAdmin = user?.role === "admin";
 ---
 
-<header
-	class="border-b border-(--color-hairline) sticky top-0 bg-(--color-canvas) z-50"
->
-	<nav
-		class="max-w-screen-xl mx-auto px-6 py-4 flex items-center justify-between gap-4"
-	>
-		<div class="flex items-center gap-8">
-			<a
-				href="/dashboard"
-				class="font-semibold text-[17px] tracking-tight leading-none select-none"
+{user && (
+		<header class="border-b border-hairline sticky top-0 bg-(--color-canvas) z-50">
+			<nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
+				<div class="flex items-center gap-8">
+					<a
+						href="/dashboard"
+						class="font-semibold text-[17px] tracking-tight leading-none select-none"
+					>
+						lets-talie
+					</a>
+					<div class="hidden nav:flex items-center gap-1">
+						<a
+							href="/dashboard"
+							class:list={navClass(
+								pathname ===
+									"/dashboard",
+							)}
+						>
+							Dashboard
+						</a>
+						<a
+							href="/transactions"
+							class:list={navClass(
+								pathname.startsWith(
+									"/transactions",
+								),
+							)}
+						>
+							Transactions
+						</a>
+						<AdminNavLinks
+							isAdmin={isAdmin}
+							pathname={pathname}
+						/>
+					</div>
+				</div>
+				<div class="flex items-center gap-3">
+					<span class="hidden nav:block text-sm text-muted truncate max-w-50">
+						{user.email}
+					</span>
+					{/* Dark mode toggle */}
+					<button
+						id="theme-toggle"
+						type="button"
+						aria-label="Toggle dark mode"
+						class="p-1.5 rounded-full border border-hairline hover:bg-surface transition-colors cursor-pointer text-muted"
+					>
+						{/* Moon icon (shown in light mode) */}
+						<svg
+							id="icon-moon"
+							xmlns="http://www.w3.org/2000/svg"
+							class="w-4 h-4"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
+							<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+						</svg>
+						{/* Sun icon (shown in dark mode) */}
+						<svg
+							id="icon-sun"
+							xmlns="http://www.w3.org/2000/svg"
+							class="w-4 h-4 hidden"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
+							<circle
+								cx="12"
+								cy="12"
+								r="5"
+							/>
+							<line
+								x1="12"
+								y1="1"
+								x2="12"
+								y2="3"
+							/>
+							<line
+								x1="12"
+								y1="21"
+								x2="12"
+								y2="23"
+							/>
+							<line
+								x1="4.22"
+								y1="4.22"
+								x2="5.64"
+								y2="5.64"
+							/>
+							<line
+								x1="18.36"
+								y1="18.36"
+								x2="19.78"
+								y2="19.78"
+							/>
+							<line
+								x1="1"
+								y1="12"
+								x2="3"
+								y2="12"
+							/>
+							<line
+								x1="21"
+								y1="12"
+								x2="23"
+								y2="12"
+							/>
+							<line
+								x1="4.22"
+								y1="19.78"
+								x2="5.64"
+								y2="18.36"
+							/>
+							<line
+								x1="18.36"
+								y1="5.64"
+								x2="19.78"
+								y2="4.22"
+							/>
+						</svg>
+					</button>
+					<SignOutButton client:load />
+					{/* Hamburger — visible below 985px */}
+					<button
+						id="mobile-menu-toggle"
+						type="button"
+						aria-label="Toggle navigation menu"
+						aria-expanded="false"
+						aria-controls="mobile-nav"
+						class="nav:hidden p-1.5 rounded-full border border-hairline hover:bg-surface transition-colors cursor-pointer text-muted"
+					>
+						<svg
+							id="icon-hamburger"
+							xmlns="http://www.w3.org/2000/svg"
+							class="w-4 h-4"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
+							<line
+								x1="3"
+								y1="6"
+								x2="21"
+								y2="6"
+							/>
+							<line
+								x1="3"
+								y1="12"
+								x2="21"
+								y2="12"
+							/>
+							<line
+								x1="3"
+								y1="18"
+								x2="21"
+								y2="18"
+							/>
+						</svg>
+						<svg
+							id="icon-close"
+							xmlns="http://www.w3.org/2000/svg"
+							class="w-4 h-4 hidden"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
+							<line
+								x1="18"
+								y1="6"
+								x2="6"
+								y2="18"
+							/>
+							<line
+								x1="6"
+								y1="6"
+								x2="18"
+								y2="18"
+							/>
+						</svg>
+					</button>
+				</div>
+			</nav>
+			{/* Mobile nav panel — hidden by default, toggled by hamburger */}
+			<div
+				id="mobile-nav"
+				class="hidden nav:hidden border-t border-hairline"
+				aria-hidden="true"
 			>
-				lets-talie
-			</a>
-			<div class="hidden sm:flex items-center gap-1">
-				<a
-					href="/dashboard"
-					class:list={navClass(
-                                                pathname === "/dashboard",
-                                        )}
-				>
-					Dashboard
-				</a>
-				<a
-					href="/transactions"
-					class:list={navClass(
-                                                pathname.startsWith(
-                                                        "/transactions",
-                                                ),
-                                        )}
-				>
-					Transactions
-				</a>
-				<AdminNavLinks isAdmin={isAdmin} pathname={pathname} />
+				<div class="max-w-7xl mx-auto px-6 py-4 flex flex-col gap-1">
+					<a
+						href="/dashboard"
+						class:list={navClass(
+							pathname ===
+								"/dashboard",
+						)}
+					>
+						Dashboard
+					</a>
+					<a
+						href="/transactions"
+						class:list={navClass(
+							pathname.startsWith(
+								"/transactions",
+							),
+						)}
+					>
+						Transactions
+					</a>
+					{isAdmin && (
+						<>
+							<a
+								href="/users"
+								class:list={navClass(
+									pathname.startsWith(
+										"/users",
+									),
+								)}
+							>
+								Users
+							</a>
+							<a
+								href="/transaction-categories"
+								class:list={navClass(
+									pathname.startsWith(
+										"/transaction-categories",
+									),
+								)}
+							>
+								Categories
+							</a>
+							<a
+								href="/import-transactions"
+								class:list={navClass(
+									pathname.startsWith(
+										"/import-transactions",
+									),
+								)}
+							>
+								Import
+							</a>
+							<a
+								href="/approve-transactions"
+								class:list={navClass(
+									pathname.startsWith(
+										"/approve-transactions",
+									),
+								)}
+							>
+								Approve
+							</a>
+						</>
+					)}
+					<p class="mt-2 pt-3 border-t border-hairline text-sm text-muted truncate">
+						{user.email}
+					</p>
+				</div>
 			</div>
-		</div>
-		<div class="flex items-center gap-3">
-			<span
-				class="hidden sm:block text-sm text-(--color-muted) truncate max-w-[200px]"
-			>
-				{email}
-			</span>
-			<!-- Dark mode toggle -->
-			<button
-				id="theme-toggle"
-				type="button"
-				aria-label="Toggle dark mode"
-				class="p-1.5 rounded-full border border-(--color-hairline) hover:bg-(--color-surface) transition-colors cursor-pointer text-(--color-muted)"
-			>
-				<!-- Moon icon (shown in light mode) -->
-				<svg
-					id="icon-moon"
-					xmlns="http://www.w3.org/2000/svg"
-					class="w-4 h-4"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					aria-hidden="true"
-				>
-					<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-				</svg>
-				<!-- Sun icon (shown in dark mode) -->
-				<svg
-					id="icon-sun"
-					xmlns="http://www.w3.org/2000/svg"
-					class="w-4 h-4 hidden"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					aria-hidden="true"
-				>
-					<circle cx="12" cy="12" r="5"></circle>
-					<line x1="12" y1="1" x2="12" y2="3"></line>
-					<line x1="12" y1="21" x2="12" y2="23"></line>
-					<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-					<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-					<line x1="1" y1="12" x2="3" y2="12"></line>
-					<line x1="21" y1="12" x2="23" y2="12"></line>
-					<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-					<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-				</svg>
-			</button>
-			<SignOutButton client:load />
-		</div>
-	</nav>
-</header>
+		</header>
+	)}
 
 <script is:inline>
 	(() => {
@@ -142,5 +324,30 @@ const isAdmin = user.role === "admin";
 			var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
 			applyTheme(next);
 		});
+
+		// Mobile menu toggle
+		var menuBtn = document.getElementById("mobile-menu-toggle");
+		var mobileNav = document.getElementById("mobile-nav");
+		var hamburgerIcon = document.getElementById("icon-hamburger");
+		var closeIcon = document.getElementById("icon-close");
+
+		if (menuBtn && mobileNav) {
+			menuBtn.addEventListener("click", () => {
+				var isOpen = menuBtn.getAttribute("aria-expanded") === "true";
+				if (isOpen) {
+					menuBtn.setAttribute("aria-expanded", "false");
+					mobileNav.setAttribute("aria-hidden", "true");
+					mobileNav.classList.add("hidden");
+					hamburgerIcon.classList.remove("hidden");
+					closeIcon.classList.add("hidden");
+				} else {
+					menuBtn.setAttribute("aria-expanded", "true");
+					mobileNav.setAttribute("aria-hidden", "false");
+					mobileNav.classList.remove("hidden");
+					hamburgerIcon.classList.add("hidden");
+					closeIcon.classList.remove("hidden");
+				}
+			});
+		}
 	})();
 </script>

@@ -20,10 +20,6 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		return Response.json({ error: "Unauthorized" }, { status: 401 });
 	}
 
-	if (sessionUser.role !== "admin") {
-		return Response.json({ error: "Forbidden" }, { status: 403 });
-	}
-
 	let body: SingleTransactionBody;
 	try {
 		body = await request.json();

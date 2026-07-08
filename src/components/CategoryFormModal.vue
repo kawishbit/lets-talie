@@ -106,7 +106,7 @@
 				<button
 					type="button"
 					@click="emit('close')"
-					class="p-1.5 rounded-full hover:bg-(--color-surface) transition-colors text-(--color-muted)"
+					class="p-1.5 rounded-full hover:bg-surface transition-colors text-muted"
 					aria-label="Close"
 				>
 					<svg
@@ -131,7 +131,7 @@
 				<div class="flex flex-col gap-1.5">
 					<label
 						for="modal-label"
-						class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+						class="text-xs font-medium uppercase tracking-wider text-label"
 						>Label</label
 					>
 					<input
@@ -140,16 +140,16 @@
 						type="text"
 						placeholder="e.g. Food & Drinks"
 						required
-						class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+						class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 					>
 				</div>
 
 				<div class="flex flex-col gap-1.5">
 					<label
 						for="modal-remarks"
-						class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+						class="text-xs font-medium uppercase tracking-wider text-label"
 						>Remarks
-						<span class="normal-case font-[400] text-(--color-muted)"
+						<span class="normal-case font-[400] text-muted"
 							>(optional)</span
 						></label
 					>
@@ -158,7 +158,7 @@
 						v-model="remarks"
 						placeholder="Any notes about this category…"
 						rows="3"
-						class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg) resize-none"
+						class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg) resize-none"
 					/>
 				</div>
 
@@ -168,14 +168,14 @@
 					<button
 						type="button"
 						@click="emit('close')"
-						class="px-4 py-2 rounded-full text-sm font-[480] tracking-[-0.01em] border border-(--color-hairline) hover:bg-(--color-surface) transition-colors cursor-pointer"
+						class="px-4 py-2 rounded-full text-sm font-[480] tracking-[-0.01em] border border-hairline hover:bg-surface transition-colors cursor-pointer"
 					>
 						Cancel
 					</button>
 					<button
 						type="submit"
 						:disabled="!canSubmit"
-						class="inline-flex items-center gap-1.5 bg-(--color-ink) text-(--color-canvas) px-4 py-2 rounded-full text-sm font-[480] tracking-[-0.01em] hover:opacity-80 transition-opacity cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+						class="inline-flex items-center gap-1.5 bg-ink text-(--color-canvas) px-4 py-2 rounded-full text-sm font-[480] tracking-[-0.01em] hover:opacity-80 transition-opacity cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
 					>
 						<span v-if="loading">Saving…</span>
 						<span v-else>{{ isEditing ? "Save changes" : "Create" }}</span>

@@ -141,7 +141,7 @@
 <template>
 	<div
 		v-if="success"
-		class="bg-(--color-badge-positive-bg) rounded-xl px-4 py-3 text-sm font-[500] text-center"
+		class="bg-(--color-badge-positive-bg) rounded-xl px-4 py-3 text-sm font-medium text-center"
 	>
 		Transaction added! Refreshing…
 	</div>
@@ -151,7 +151,7 @@
 		<div class="flex flex-col gap-1.5">
 			<label
 				for="gt-name"
-				class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+				class="text-xs font-medium uppercase tracking-wider text-label"
 				>Name</label
 			>
 			<input
@@ -160,7 +160,7 @@
 				type="text"
 				placeholder="Dinner at Sakura"
 				required
-				class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+				class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-inkn-colors bg-(--color-input-bg)"
 			>
 		</div>
 
@@ -169,7 +169,7 @@
 			<div class="flex flex-col gap-1.5">
 				<label
 					for="gt-date"
-					class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+					class="text-xs font-medium uppercase tracking-wider text-label"
 					>Date</label
 				>
 				<input
@@ -177,13 +177,13 @@
 					v-model="date"
 					type="date"
 					required
-					class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+					class="w-full px-3 py-2.5 rounded-xl border border-hairlineutline-none focus:bordfocus:border-inkn-colors bg-(--color-input-bg)"
 				>
 			</div>
 			<div class="flex flex-col gap-1.5">
 				<label
 					for="gt-amount"
-					class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+					class="text-xs font-mediumm uppercase tracking-widertext-label)"
 					>Amount</label
 				>
 				<input
@@ -194,7 +194,7 @@
 					step="0.01"
 					placeholder="0.00"
 					required
-					class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+					class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 				>
 			</div>
 		</div>
@@ -203,13 +203,13 @@
 		<div class="flex flex-col gap-1.5">
 			<label
 				for="gt-paidby"
-				class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+				class="text-xs font-medium uppercase tracking-wider text-label"
 				>Paid by</label
 			>
 			<select
 				id="gt-paidby"
 				v-model="paidByUserId"
-				class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+				class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 			>
 				<option v-for="u in users" :key="u.id" :value="u.id">
 					{{ u.name }}
@@ -219,9 +219,7 @@
 
 		<!-- Parties -->
 		<div class="flex flex-col gap-1.5">
-			<p
-				class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
-			>
+			<p class="text-xs font-medium uppercase tracking-wider text-label">
 				Parties
 			</p>
 			<div class="flex flex-wrap gap-2">
@@ -232,10 +230,10 @@
 					@click="toggleParty(u.id)"
 					:disabled="u.id === paidByUserId"
 					:class="[
-            'px-3 py-1.5 rounded-full text-xs font-[500] border transition-colors',
+            'px-3 py-1.5 rounded-full text-xs font-medium border transition-colors',
             selectedParties.includes(u.id)
-              ? 'bg-(--color-ink) text-(--color-canvas) border-(--color-ink)'
-              : 'bg-(--color-canvas) text-(--color-ink) border-(--color-hairline) hover:border-(--color-ink)',
+              ? 'bg-ink text-(--color-canvas) border-ink'
+              : 'bg-(--color-canvas) text-ink border-hairline hover:border-ink',
             u.id === paidByUserId ? 'opacity-60 cursor-default' : 'cursor-pointer',
           ]"
 				>
@@ -250,9 +248,9 @@
 				id="customAmounts"
 				v-model="useCustomAmounts"
 				type="checkbox"
-				class="w-4 h-4 rounded accent-(--color-ink) cursor-pointer"
+				class="w-4 h-4 rounded accent-ink cursor-pointer"
 			>
-			<label for="customAmounts" class="text-xs font-[500] cursor-pointer"
+			<label for="customAmounts" class="text-xs font-medium cursor-pointer"
 				>Custom split amounts</label
 			>
 		</div>
@@ -260,7 +258,7 @@
 		<!-- Custom amount inputs -->
 		<div
 			v-if="useCustomAmounts && selectedParties.length > 0"
-			class="flex flex-col gap-2 p-3 bg-(--color-surface) rounded-xl"
+			class="flex flex-col gap-2 p-3 bg-surface rounded-xl"
 		>
 			<div
 				v-for="uid in selectedParties"
@@ -276,11 +274,11 @@
 					min="0"
 					step="0.01"
 					placeholder="0.00"
-					class="w-24 px-2 py-1.5 rounded-lg border border-(--color-hairline) text-sm text-right outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+					class="w-24 px-2 py-1.5 rounded-lg border border-hairline text-sm text-right outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 				>
 			</div>
 			<p
-				:class="['text-xs mt-1 text-right', customAmountsValid ? 'text-(--color-label)' : 'text-red-500']"
+				:class="['text-xs mt-1 text-right', customAmountsValid ? 'text-label' : 'text-red-500']"
 			>
 				Sum: {{ customAmountsSum.toFixed(2) }} / {{ amount || '0.00' }}
 			</p>
@@ -290,13 +288,13 @@
 		<div v-if="categories.length > 0" class="flex flex-col gap-1.5">
 			<label
 				for="gt-category"
-				class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+				class="text-xs font-medium uppercase tracking-wider text-label"
 				>Category <span class="normal-case font-[330]">(optional)</span></label
 			>
 			<select
 				id="gt-category"
 				v-model="categoryId"
-				class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+				class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 			>
 				<option value="">— No category —</option>
 				<option v-for="c in categories" :key="c.id" :value="c.id">
@@ -309,7 +307,7 @@
 		<div class="flex flex-col gap-1.5">
 			<label
 				for="gt-remarks"
-				class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+				class="text-xs font-medium uppercase tracking-wider text-label"
 				>Remarks <span class="normal-case font-[330]">(optional)</span></label
 			>
 			<input
@@ -317,7 +315,7 @@
 				v-model="remarks"
 				type="text"
 				placeholder="Any notes…"
-				class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+				class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 			>
 		</div>
 
@@ -326,7 +324,7 @@
 		<button
 			type="submit"
 			:disabled="loading || !canSubmit"
-			class="w-full bg-(--color-ink) text-(--color-canvas) py-2.5 rounded-full text-sm font-[480] tracking-[-0.01em] hover:opacity-80 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer mt-1"
+			class="w-full bg-ink text-(--color-canvas) py-2.5 rounded-full text-sm font-[480] tracking-[-0.01em] hover:opacity-80 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer mt-1"
 		>
 			{{ loading ? 'Submitting…' : 'Add group transaction' }}
 		</button>

@@ -5,6 +5,8 @@
 	--font-sans: "Inter", system-ui, -apple-system, sans-serif;
 	--font-mono: "JetBrains Mono", "SF Mono", Menlo, monospace;
 
+	--breakpoint-nav: 985px;
+
 	/* Core palette */
 	--color-ink: #0a0a0a;
 	--color-canvas: #ffffff;
@@ -124,4 +126,6 @@ html {
 	background: var(--color-canvas);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	overflow-x: auto;
+	min-width: 450px;
 }

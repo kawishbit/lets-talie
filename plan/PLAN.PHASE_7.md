@@ -2,7 +2,7 @@
 
 The strategy is CSS-variable-first: all color decisions are expressed as custom properties. Dark mode simply overrides those properties under a `.dark` class on `<html>`. No Tailwind `dark:` prefixes are needed in template markup — the CSS variables change, and every consumer updates automatically. Class-based toggling is used (rather than media-query-only) so the user's explicit choice persists across sessions, while still falling back to `prefers-color-scheme` when no preference has been saved.
 
-## 7a — Extend `src/styles/global.css` ✅
+[x] ## 7a — Extend `src/styles/global.css` 
 
 Add the missing semantic tokens that are currently hardcoded as raw hex values in templates, and define dark-mode overrides for all tokens.
 
@@ -74,15 +74,15 @@ Dark values:
 
 Also update `html` base styles to use the tokens and remove hardcoded color/background values.
 
-## 7b — Replace hardcoded hex values in all Vue components and Astro pages ✅
+[x] ## 7b — Replace hardcoded hex values in all Vue components and Astro pages 
 
 Every hardcoded `[#hex]`, `bg-white`, `text-white` (on dark backgrounds), `bg-black/40` in class attributes must be replaced with the appropriate CSS variable reference. The mapping:
 
 | Old class fragment | New class fragment |
 |---|---|
-| `[#0a0a0a]` / `bg-[#0a0a0a]` | `[--color-ink]` / `bg-(--color-ink)` |
+| `[#0a0a0a]` / `bg-[#0a0a0a]` | `[--color-ink]` / `bg-ink` |
 | `[#e8e8e8]` | `[--color-hairline]` |
-| `[#f5f5f5]` / `bg-[#f5f5f5]` | `[--color-surface]` / `bg-(--color-surface)` |
+| `[#f5f5f5]` / `bg-[#f5f5f5]` | `[--color-surface]` / `bg-surface` |
 | `[#737373]` | `[--color-muted]` |
 | `[#525252]` | `[--color-label]` |
 | `[#a3a3a3]` | `[--color-subtle]` |
@@ -96,9 +96,9 @@ Every hardcoded `[#hex]`, `bg-white`, `text-white` (on dark backgrounds), `bg-bl
 | `text-[#8b2500]` | `text-(--color-badge-negative-text)` |
 | `bg-[#d4f0e8] text-[#0a6047]` (completed) | `bg-(--color-badge-completed-bg) text-(--color-badge-completed-text)` |
 | `bg-[#faf7f0] text-[#7c5e0a]` (pending) | `bg-(--color-badge-pending-bg) text-(--color-badge-pending-text)` |
-| `bg-[#fff0f0]` (error bg) | `bg-(--color-error-bg)` |
-| `border-red-200` | `border-(--color-error-border)` |
-| `text-red-700` | `text-(--color-error-text)` |
+| `bg-[#fff0f0]` (error bg) | `bg-error-bg` |
+| `border-red-200` | `border-error-border` |
+| `text-red-700` | `text-error-text` |
 | Import page hardcoded `[#d4cdbf]`, `[#ece7df]` | use `[--color-hairline]` |
 
 Files affected:
@@ -115,7 +115,7 @@ Files affected:
 - `src/components/UserTable.vue`
 - `src/pages/import-transactions.astro`
 
-## 7c — Flash-prevention script in `src/layouts/Layout.astro` ✅
+[x] ## 7c — Flash-prevention script in `src/layouts/Layout.astro` 
 
 Add an inline `<script>` in `<head>` (before any CSS loads) that reads `localStorage.getItem('theme')` and immediately applies `data-theme="dark"` to `<html>` if needed. This prevents the white flash on page load for users who prefer dark mode.
 
@@ -129,7 +129,7 @@ Add an inline `<script>` in `<head>` (before any CSS loads) that reads `localSto
 </script>
 ```
 
-## 7d — Dark mode toggle in `src/components/AppHeader.astro` ✅
+[x] ## 7d — Dark mode toggle in `src/components/AppHeader.astro` 
 
 Add a sun/moon toggle button to the right side of the nav (next to the sign-out button). Uses inline SVG — no icon library needed.
 
@@ -137,10 +137,10 @@ Add a sun/moon toggle button to the right side of the nav (next to the sign-out 
 - On click: toggles `data-theme` attribute on `<html>` between `"light"` and `"dark"`, persists to `localStorage`
 - Script is `is:inline` so it runs client-side without a framework
 
-## 7e — `src/components/AppHeader.astro` nav link active state ✅
+[x] ## 7e — `src/components/AppHeader.astro` nav link active state 
 
 The `navClass` utility uses `bg-ink` and `text-canvas` — both are already CSS-variable-backed Tailwind theme tokens and required no changes.
 
-## 7f — Verify `src/utils/nav.ts` ✅
+[x] ## 7f — Verify `src/utils/nav.ts` 
 
-Confirmed `navClass` uses `bg-ink` and `hover:bg-(--color-surface)` — no changes needed.
+Confirmed `navClass` uses `bg-ink` and `hover:bg-surface` — no changes needed.

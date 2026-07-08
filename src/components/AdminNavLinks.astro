@@ -7,27 +7,47 @@ interface Props {
 }
 
 const { isAdmin, pathname } = Astro.props;
-if (!isAdmin) return new Response(null, { status: 200 });
 ---
 
-<a href="/users" class:list={navClass(pathname.startsWith("/users"))}>
-	Users
-</a>
-<a
-	href="/transaction-categories"
-	class:list={navClass(pathname.startsWith("/transaction-categories"))}
->
-	Categories
-</a>
-<a
-	href="/import-transactions"
-	class:list={navClass(pathname.startsWith("/import-transactions"))}
->
-	Import
-</a>
-<a
-	href="/approve-transactions"
-	class:list={navClass(pathname.startsWith("/approve-transactions"))}
->
-	Approve
-</a>
+{isAdmin && (
+		<>
+			<a
+				href="/users"
+				class:list={navClass(
+					pathname.startsWith("/users"),
+				)}
+			>
+				Users
+			</a>
+			<a
+				href="/transaction-categories"
+				class:list={navClass(
+					pathname.startsWith(
+						"/transaction-categories",
+					),
+				)}
+			>
+				Categories
+			</a>
+			<a
+				href="/import-transactions"
+				class:list={navClass(
+					pathname.startsWith(
+						"/import-transactions",
+					),
+				)}
+			>
+				Import
+			</a>
+			<a
+				href="/approve-transactions"
+				class:list={navClass(
+					pathname.startsWith(
+						"/approve-transactions",
+					),
+				)}
+			>
+				Approve
+			</a>
+		</>
+	)}

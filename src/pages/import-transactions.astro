@@ -12,12 +12,10 @@ if (Astro.locals.user.role !== "admin") {
 ---
 
 <Layout title="Import Transactions">
-	<div class="max-w-screen-lg mx-auto px-6 py-10">
+	<div class="max-w-5xl mx-auto px-6 py-10">
 		<!-- Header -->
 		<div class="mb-8">
-			<p
-				class="font-mono text-xs uppercase tracking-widest text-(--color-muted) mb-2"
-			>
+			<p class="font-mono text-xs uppercase tracking-widest text-muted mb-2">
 				Admin
 			</p>
 			<h1
@@ -25,7 +23,7 @@ if (Astro.locals.user.role !== "admin") {
 			>
 				Import Transactions
 			</h1>
-			<p class="text-sm text-(--color-muted) font-[330] mt-2">
+			<p class="text-sm text-muted font-[330] mt-2">
 				Bulk import transactions from a CSV or JSON file. All rows are validated
 				before import — any errors must be fixed first.
 			</p>
@@ -33,60 +31,68 @@ if (Astro.locals.user.role !== "admin") {
 
 		<!-- Format reference -->
 		<div class="bg-(--color-block-cream) rounded-2xl px-6 py-5 mb-8 text-sm">
-			<p
-				class="font-mono text-xs uppercase tracking-widest text-(--color-muted) mb-3"
-			>
+			<p class="font-mono text-xs uppercase tracking-widest text-muted mb-3">
 				Expected format
 			</p>
 			<div class="overflow-x-auto">
 				<table class="text-xs font-mono">
 					<thead>
-						<tr class="text-left border-b border-(--color-hairline)">
-							<th class="pr-4 pb-2 font-[500]">Field</th>
-							<th class="pr-4 pb-2 font-[500]">Type</th>
-							<th class="pb-2 font-[500]">Notes</th>
+						<tr class="text-left border-b border-hairline">
+							<th class="pr-4 pb-2 font-medium">Field</th>
+							<th class="pr-4 pb-2 font-medium">Type</th>
+							<th class="pb-2 font-medium">Notes</th>
 						</tr>
 					</thead>
-					<tbody class="text-(--color-label)">
-						<tr class="border-b border-(--color-hairline)">
+					<tbody class="text-label">
+						<tr class="border-b border-hairline">
 							<td class="pr-4 py-1.5">name</td>
 							<td class="pr-4 py-1.5">string</td>
 							<td class="py-1.5">Required</td>
 						</tr>
-						<tr class="border-b border-(--color-hairline)">
+						<tr class="border-b border-hairline">
 							<td class="pr-4 py-1.5">date</td>
 							<td class="pr-4 py-1.5">string</td>
 							<td class="py-1.5">ISO 8601 e.g. 2026-07-01</td>
 						</tr>
-						<tr class="border-b border-(--color-hairline)">
+						<tr class="border-b border-hairline">
 							<td class="pr-4 py-1.5">amount</td>
 							<td class="pr-4 py-1.5">number</td>
 							<td class="py-1.5">Positive decimal</td>
 						</tr>
-						<tr class="border-b border-(--color-hairline)">
+						<tr class="border-b border-hairline">
 							<td class="pr-4 py-1.5">paidByUserId</td>
 							<td class="pr-4 py-1.5">string</td>
 							<td class="py-1.5">User ID from /users</td>
 						</tr>
-						<tr class="border-b border-(--color-hairline)">
+						<tr class="border-b border-hairline">
 							<td class="pr-4 py-1.5">type</td>
 							<td class="pr-4 py-1.5">string</td>
 							<td class="py-1.5">"deposit" | "withdrawal"</td>
 						</tr>
-						<tr class="border-b border-(--color-hairline)">
+						<tr class="border-b border-hairline">
 							<td class="pr-4 py-1.5">status</td>
 							<td class="pr-4 py-1.5">string</td>
 							<td class="py-1.5">"pending" | "completed" | "cancelled"</td>
 						</tr>
-						<tr class="border-b border-(--color-hairline)">
+						<tr class="border-b border-hairline">
 							<td class="pr-4 py-1.5">remarks</td>
 							<td class="pr-4 py-1.5">string</td>
 							<td class="py-1.5">Optional</td>
 						</tr>
-						<tr>
+						<tr class="border-b border-hairline">
 							<td class="pr-4 py-1.5">categoryId</td>
 							<td class="pr-4 py-1.5">string</td>
 							<td class="py-1.5">Optional — category ID</td>
+						</tr>
+						<tr class="border-b border-hairline">
+							<td class="pr-4 py-1.5">transactionGroupId</td>
+							<td class="pr-4 py-1.5">string</td>
+							<td class="py-1.5">Optional — group key to link rows</td>
+						</tr>
+						<tr>
+							<td class="pr-4 py-1.5">createdAt</td>
+							<td class="pr-4 py-1.5">string</td>
+							<td class="py-1.5">Optional — ISO 8601 override</td>
 						</tr>
 					</tbody>
 				</table>
@@ -94,7 +100,7 @@ if (Astro.locals.user.role !== "admin") {
 		</div>
 
 		<!-- Form -->
-		<div class="border border-(--color-hairline) rounded-2xl p-6">
+		<div class="border border-hairline rounded-2xl p-6">
 			<ImportForm client:load />
 		</div>
 	</div>

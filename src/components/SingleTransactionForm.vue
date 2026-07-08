@@ -91,7 +91,7 @@
 <template>
 	<div
 		v-if="success"
-		class="bg-(--color-badge-positive-bg) rounded-xl px-4 py-3 text-sm font-[500] text-center"
+		class="bg-(--color-badge-positive-bg) rounded-xl px-4 py-3 text-sm font-medium text-center"
 	>
 		Transaction added! Refreshing…
 	</div>
@@ -101,7 +101,7 @@
 		<div class="flex flex-col gap-1.5">
 			<label
 				for="tx-name"
-				class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+				class="text-xs font-medium uppercase tracking-wider text-label"
 				>Name</label
 			>
 			<input
@@ -110,7 +110,7 @@
 				type="text"
 				placeholder="Balance adjustment"
 				required
-				class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+				class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 			>
 		</div>
 
@@ -119,7 +119,7 @@
 			<div class="flex flex-col gap-1.5">
 				<label
 					for="tx-date"
-					class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+					class="text-xs font-medium uppercase tracking-wider text-label"
 					>Date</label
 				>
 				<input
@@ -127,13 +127,13 @@
 					v-model="date"
 					type="date"
 					required
-					class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+					class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 				>
 			</div>
 			<div class="flex flex-col gap-1.5">
 				<label
 					for="tx-amount"
-					class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+					class="text-xs font-medium uppercase tracking-wider text-label"
 					>Amount</label
 				>
 				<input
@@ -144,7 +144,7 @@
 					step="0.01"
 					placeholder="0.00"
 					required
-					class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+					class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 				>
 			</div>
 		</div>
@@ -153,14 +153,14 @@
 		<div class="flex flex-col gap-1.5">
 			<label
 				for="tx-user"
-				class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+				class="text-xs font-medium uppercase tracking-wider text-label"
 				>User</label
 			>
 			<select
 				id="tx-user"
 				v-model="paidByUserId"
 				required
-				class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+				class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 			>
 				<option value="">— Select user —</option>
 				<option v-for="u in users" :key="u.id" :value="u.id">
@@ -174,13 +174,13 @@
 			<div class="flex flex-col gap-1.5">
 				<label
 					for="tx-type"
-					class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+					class="text-xs font-medium uppercase tracking-wider text-label"
 					>Type</label
 				>
 				<select
 					id="tx-type"
 					v-model="type"
-					class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+					class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 				>
 					<option value="deposit">Deposit</option>
 					<option value="withdrawal">Withdrawal</option>
@@ -189,13 +189,13 @@
 			<div class="flex flex-col gap-1.5">
 				<label
 					for="tx-status"
-					class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+					class="text-xs font-medium uppercase tracking-wider text-label"
 					>Status</label
 				>
 				<select
 					id="tx-status"
 					v-model="status"
-					class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+					class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 				>
 					<option value="completed">Completed</option>
 					<option value="pending">Pending</option>
@@ -208,13 +208,13 @@
 		<div v-if="categories.length > 0" class="flex flex-col gap-1.5">
 			<label
 				for="tx-category"
-				class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+				class="text-xs font-medium uppercase tracking-wider text-label"
 				>Category <span class="normal-case font-[330]">(optional)</span></label
 			>
 			<select
 				id="tx-category"
 				v-model="categoryId"
-				class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+				class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 			>
 				<option value="">— No category —</option>
 				<option v-for="c in categories" :key="c.id" :value="c.id">
@@ -227,7 +227,7 @@
 		<div class="flex flex-col gap-1.5">
 			<label
 				for="tx-remarks"
-				class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+				class="text-xs font-medium uppercase tracking-wider text-label"
 				>Remarks <span class="normal-case font-[330]">(optional)</span></label
 			>
 			<input
@@ -235,7 +235,7 @@
 				v-model="remarks"
 				type="text"
 				placeholder="Any notes…"
-				class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+				class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 			>
 		</div>
 
@@ -244,7 +244,7 @@
 		<button
 			type="submit"
 			:disabled="loading || !canSubmit"
-			class="w-full bg-(--color-ink) text-(--color-canvas) py-2.5 rounded-full text-sm font-[480] tracking-[-0.01em] hover:opacity-80 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer mt-1"
+			class="w-full bg-ink text-(--color-canvas) py-2.5 rounded-full text-sm font-[480] tracking-[-0.01em] hover:opacity-80 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer mt-1"
 		>
 			{{ loading ? 'Submitting…' : 'Add single transaction' }}
 		</button>

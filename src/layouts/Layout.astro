@@ -36,7 +36,7 @@ const pathname = new URL(Astro.request.url).pathname;
 			})();
 		</script>
 	</head>
-	<body class="min-h-screen bg-(--color-canvas) text-(--color-ink)">
+	<body class="min-h-screen bg-(--color-canvas) text-ink">
 		<AppHeader user={currentUser} pathname={pathname} />
 		<main>
 			<slot />

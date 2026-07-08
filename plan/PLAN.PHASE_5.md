@@ -19,7 +19,7 @@
   - Fields: name, date, remarks, amount, paid by (dropdown), parties (multi-select), category (dropdown)
   - Per-party custom amount toggle; validation that custom amounts sum to total
   - Submits to `POST /api/transactions/group`
-- [x] "Add Single Transaction" tab/section (admin only) — `SingleTransactionForm.vue`
+- [x] "Add Single Transaction" tab/section — `SingleTransactionForm.vue` (available to all users)
   - Fields: name, date, remarks, amount, paid by, type, status, category
   - Submits to `POST /api/transactions/single`
 
@@ -48,6 +48,8 @@
 ## Import Transactions — `/import-transactions` (admin only)
 
 - [x] `ImportForm.vue`
+  - Accepts `.csv` or `.json`
+  - Optional fields: `transactionGroupId` (group key to link rows) and `createdAt` (ISO 8601 date override)
   - File input: `.csv` or `.json`
   - Preview parsed rows in a table
   - Per-row validation errors shown inline

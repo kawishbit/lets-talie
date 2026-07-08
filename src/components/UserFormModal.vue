@@ -116,7 +116,7 @@
 				<button
 					type="button"
 					@click="emit('close')"
-					class="p-1.5 rounded-full hover:bg-(--color-surface) transition-colors text-(--color-muted)"
+					class="p-1.5 rounded-full hover:bg-surface transition-colors text-muted"
 					aria-label="Close"
 				>
 					<svg
@@ -141,7 +141,7 @@
 				<div class="flex flex-col gap-1.5">
 					<label
 						for="modal-name"
-						class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+						class="text-xs font-medium uppercase tracking-wider text-label"
 						>Name</label
 					>
 					<input
@@ -150,14 +150,14 @@
 						type="text"
 						placeholder="Jane Doe"
 						required
-						class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+						class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 					>
 				</div>
 
 				<div class="flex flex-col gap-1.5">
 					<label
 						for="modal-email"
-						class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+						class="text-xs font-medium uppercase tracking-wider text-label"
 						>Email</label
 					>
 					<input
@@ -166,20 +166,20 @@
 						type="email"
 						placeholder="jane@example.com"
 						required
-						class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+						class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 					>
 				</div>
 
 				<div class="flex flex-col gap-1.5">
 					<label
 						for="modal-role"
-						class="text-xs font-[500] uppercase tracking-wider text-(--color-label)"
+						class="text-xs font-medium uppercase tracking-wider text-label"
 						>Role</label
 					>
 					<select
 						id="modal-role"
 						v-model="role"
-						class="w-full px-3 py-2.5 rounded-xl border border-(--color-hairline) text-sm outline-none focus:border-(--color-ink) transition-colors bg-(--color-input-bg)"
+						class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 					>
 						<option value="user">User</option>
 						<option value="admin">Admin</option>
@@ -192,14 +192,14 @@
 					<button
 						type="button"
 						@click="emit('close')"
-						class="flex-1 border border-(--color-hairline) py-2.5 rounded-full text-sm font-[480] tracking-[-0.01em] hover:bg-(--color-surface) transition-colors cursor-pointer"
+						class="flex-1 border border-hairline py-2.5 rounded-full text-sm font-[480] tracking-[-0.01em] hover:bg-surface transition-colors cursor-pointer"
 					>
 						Cancel
 					</button>
 					<button
 						type="submit"
 						:disabled="!canSubmit"
-						class="flex-1 bg-(--color-ink) text-(--color-canvas) py-2.5 rounded-full text-sm font-[480] tracking-[-0.01em] hover:opacity-80 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+						class="flex-1 bg-ink text-(--color-canvas) py-2.5 rounded-full text-sm font-[480] tracking-[-0.01em] hover:opacity-80 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
 					>
 						{{ loading ? (isEditing ? "Saving…" : "Creating…") : (isEditing ? "Save changes" : "Create user") }}
 					</button>

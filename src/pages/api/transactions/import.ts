@@ -12,6 +12,8 @@ interface ImportRow {
 	type: string;
 	status: string;
 	categoryId?: string;
+	transactionGroupId?: string;
+	createdAt?: string;
 }
 
 interface ValidatedRow {
@@ -23,6 +25,8 @@ interface ValidatedRow {
 	type: "deposit" | "withdrawal";
 	status: "pending" | "completed" | "cancelled";
 	categoryId: string | null;
+	transactionGroupId: string | null;
+	createdAt: Date | null;
 }
 
 interface RowError {
@@ -87,6 +91,15 @@ function validateRows(rows: ImportRow[]): {
 			rowErrors.push('status must be "pending", "completed", or "cancelled"');
 		}
 
+		let parsedCreatedAt: Date | null = null;
+		if (row.createdAt) {
+			parsedCreatedAt = new Date(row.createdAt);
+			if (Number.isNaN(parsedCreatedAt.getTime())) {
+				rowErrors.push("createdAt must be a valid date string if provided");
+				parsedCreatedAt = null;
+			}
+		}
+
 		if (rowErrors.length > 0) {
 			errors.push({ row: rowNum, errors: rowErrors });
 		} else {
@@ -99,6 +112,8 @@ function validateRows(rows: ImportRow[]): {
 				type: row.type as "deposit" | "withdrawal",
 				status: row.status as "pending" | "completed" | "cancelled",
 				categoryId: row.categoryId?.trim() || null,
+				transactionGroupId: row.transactionGroupId?.trim() || null,
+				createdAt: parsedCreatedAt,
 			});
 		}
 	});
@@ -186,7 +201,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		for (const row of validRows) {
 			await tx.insert(transactions).values({
 				id: crypto.randomUUID(),
-				transactionGroupId: null,
+				transactionGroupId: row.transactionGroupId,
 				name: row.name,
 				date: row.date,
 				remarks: row.remarks,
@@ -196,7 +211,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				paidByUserId: row.paidByUserId,
 				categoryId: row.categoryId,
 				createdByUserId: sessionUser.id,
-				createdAt: now,
+				createdAt: row.createdAt ?? now,
 				updatedAt: now,
 			});
 		}

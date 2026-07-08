@@ -18,7 +18,7 @@ export default defineConfig({
 			manifest: {
 				name: "lets-talie",
 				short_name: "lets-talie",
-				description: "A brief description of your PWA",
+				description: "A self-hosted expense tracking and group transaction app",
 				theme_color: "#ffffff",
 				icons: [
 					{

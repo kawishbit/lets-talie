@@ -89,12 +89,10 @@ const txItems = items.map((t) => ({
 ---
 
 <Layout title="Transactions">
-	<div class="max-w-screen-xl mx-auto px-6 py-10">
+	<div class="max-w-7xl mx-auto px-6 py-10">
 		<!-- Header -->
 		<div class="mb-8">
-			<p
-				class="font-mono text-xs uppercase tracking-widest text-(--color-muted) mb-2"
-			>
+			<p class="font-mono text-xs uppercase tracking-widest text-muted mb-2">
 				{isAdmin ? "All" : "My"}
 			</p>
 			<h1
@@ -102,11 +100,11 @@ const txItems = items.map((t) => ({
 			>
 				Transactions
 			</h1>
-			<p class="text-sm text-(--color-muted) font-[330] mt-2">
+			<p class="text-sm text-muted font-[330] mt-2">
 				{total}&nbsp;{total === 1
-                                                ? "transaction"
-                                                : "transactions"}
-				total
+						? "transaction"
+						: "transactions"}
+				&nbsp;total
 			</p>
 		</div>
 

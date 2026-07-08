@@ -1,8 +1,9 @@
-import { adminClient, magicLinkClient } from "better-auth/client/plugins";
+import { adminClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/vue";
+import { passwordlessBundleClient } from "./passwordless";
 
 export const authClient = createAuthClient({
-	plugins: [adminClient(), magicLinkClient()],
+	plugins: [adminClient(), passwordlessBundleClient()],
 });
 
-export const { signIn, signOut } = authClient;
+export const { signOut } = authClient;

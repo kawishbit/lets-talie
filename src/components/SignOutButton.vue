@@ -16,7 +16,7 @@
 	<button
 		type="button"
 		@click="handleSignOut"
-		class="px-3 py-1.5 rounded-full text-sm border border-(--color-hairline) hover:bg-(--color-surface) transition-colors cursor-pointer"
+		class="px-3 py-1.5 rounded-full text-sm border border-hairline hover:bg-surface transition-colors cursor-pointer"
 	>
 		Sign out
 	</button>

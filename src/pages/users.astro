@@ -51,12 +51,10 @@ const userItems = items.map((u) => ({
 ---
 
 <Layout title="Users">
-	<div class="max-w-screen-xl mx-auto px-6 py-10">
+	<div class="max-w-7xl mx-auto px-6 py-10">
 		<!-- Header -->
 		<div class="mb-8">
-			<p
-				class="font-mono text-xs uppercase tracking-widest text-(--color-muted) mb-2"
-			>
+			<p class="font-mono text-xs uppercase tracking-widest text-muted mb-2">
 				Admin
 			</p>
 			<h1
@@ -64,9 +62,9 @@ const userItems = items.map((u) => ({
 			>
 				Users
 			</h1>
-			<p class="text-sm text-(--color-muted) font-[330] mt-2">
+			<p class="text-sm text-muted font-[330] mt-2">
 				{total}&nbsp;{total === 1 ? "user" : "users"}
-				total
+				&nbsp;total
 			</p>
 		</div>
 

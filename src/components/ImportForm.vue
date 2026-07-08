@@ -11,6 +11,8 @@
 		type?: string;
 		status?: string;
 		categoryId?: string;
+		transactionGroupId?: string;
+		createdAt?: string;
 		[key: string]: unknown;
 	}
 
@@ -191,6 +193,8 @@
 		"status",
 		"remarks",
 		"categoryId",
+		"transactionGroupId",
+		"createdAt",
 	] as const;
 </script>
 
@@ -199,8 +203,8 @@
 		v-if="success"
 		class="bg-(--color-block-lime) rounded-2xl px-6 py-8 text-center"
 	>
-		<p class="text-lg font-[500] tracking-[-0.01em]">Import successful!</p>
-		<p class="text-sm text-(--color-muted) mt-1">
+		<p class="text-lg font-medium tracking-[-0.01em]">Import successful!</p>
+		<p class="text-sm text-muted mt-1">
 			{{ parsedRows.length }}
 			transaction{{ parsedRows.length === 1 ? '' : 's' }}
 			imported.
@@ -212,7 +216,7 @@
 		<div class="mb-6">
 			<label
 				for="file-upload"
-				class="block text-xs font-[500] uppercase tracking-wider text-(--color-label) mb-2"
+				class="block text-xs font-medium uppercase tracking-wider text-label mb-2"
 			>
 				Upload file
 			</label>
@@ -222,20 +226,17 @@
 				type="file"
 				accept=".csv,.json,text/csv,application/json"
 				@change="handleFileChange"
-				class="block w-full text-sm text-(--color-label)
+				class="block w-full text-sm text-label
           file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0
-          file:text-sm file:font-[480] file:bg-(--color-ink) file:text-(--color-canvas)
+          file:text-sm file:font-[480] file:bg-ink file:text-(--color-canvas)
           hover:file:opacity-80 file:cursor-pointer file:transition-opacity"
 			>
-			<p class="mt-2 text-xs text-(--color-muted)">
+			<p class="mt-2 text-xs text-muted">
 				Accepted formats:
-				<code class="font-mono bg-(--color-surface) px-1 py-0.5 rounded"
-					>.csv</code
-				>
+				<code class="font-mono bg-surface px-1 py-0.5 rounded">.csv</code>
 				or
-				<code class="font-mono bg-(--color-surface) px-1 py-0.5 rounded"
-					>.json</code
-				>. Required fields: <code class="font-mono">name</code>,
+				<code class="font-mono bg-surface px-1 py-0.5 rounded">.json</code>.
+				Required fields: <code class="font-mono">name</code>,
 				<code class="font-mono">date</code>,
 				<code class="font-mono">amount</code>,
 				<code class="font-mono">paidByUserId</code>,
@@ -247,7 +248,7 @@
 		<!-- Parse error -->
 		<div
 			v-if="parseError"
-			class="bg-(--color-error-bg) border border-(--color-error-border) rounded-xl px-4 py-3 text-sm text-(--color-error-text) mb-6"
+			class="bg-error-bg border border-error-border rounded-xl px-4 py-3 text-sm text-error-text mb-6"
 		>
 			{{ parseError }}
 		</div>
@@ -255,7 +256,7 @@
 		<!-- Preview table -->
 		<div v-if="parsedRows.length > 0" class="mb-6">
 			<div class="flex items-center justify-between mb-3">
-				<p class="text-sm font-[500]">
+				<p class="text-sm font-medium">
 					Preview —
 					{{ parsedRows.length }}
 					row{{ parsedRows.length === 1 ? '' : 's' }}
@@ -266,27 +267,25 @@
 				</p>
 			</div>
 
-			<div class="border border-(--color-hairline) rounded-2xl overflow-hidden">
+			<div class="border border-hairline rounded-2xl overflow-hidden">
 				<div class="overflow-x-auto">
 					<table class="w-full text-xs">
 						<thead>
-							<tr
-								class="border-b border-(--color-hairline) bg-(--color-surface)"
-							>
+							<tr class="border-b border-hairline bg-surface">
 								<th
-									class="text-left px-3 py-2.5 font-[500] text-(--color-label) uppercase tracking-wider"
+									class="text-left px-3 py-2.5 font-medium text-label uppercase tracking-wider"
 								>
 									#
 								</th>
 								<th
 									v-for="col in columns"
 									:key="col"
-									class="text-left px-3 py-2.5 font-[500] text-(--color-label) uppercase tracking-wider"
+									class="text-left px-3 py-2.5 font-medium text-label uppercase tracking-wider"
 								>
 									{{ col }}
 								</th>
 								<th
-									class="text-left px-3 py-2.5 font-[500] text-(--color-label) uppercase tracking-wider"
+									class="text-left px-3 py-2.5 font-medium text-label uppercase tracking-wider"
 								>
 									Errors
 								</th>
@@ -297,22 +296,22 @@
 								v-for="row in parsedRows"
 								:key="row._rowNum"
 								:class="[
-                  'border-b border-(--color-hairline) last:border-0',
-                  errorsForRow(row._rowNum).length > 0 ? 'bg-(--color-error-bg)' : '',
+                  'border-b border-hairline last:border-0',
+                  errorsForRow(row._rowNum).length > 0 ? 'bg-error-bg' : '',
                 ]"
 							>
-								<td class="px-3 py-2 text-(--color-subtle)">
+								<td class="px-3 py-2 text-subtle">
 									{{ row._rowNum }}
 								</td>
 								<td
 									v-for="col in columns"
 									:key="col"
-									class="px-3 py-2 max-w-[120px] truncate"
+									class="px-3 py-2 max-w-30 truncate"
 								>
 									<span v-if="row[col] !== undefined && row[col] !== ''"
 										>{{ row[col] }}</span
 									>
-									<span v-else class="text-(--color-subtle)">—</span>
+									<span v-else class="text-subtle">—</span>
 								</td>
 								<td class="px-3 py-2">
 									<ul
@@ -323,9 +322,7 @@
 											{{ err }}
 										</li>
 									</ul>
-									<span v-else class="text-(--color-badge-positive-text)"
-										>✓</span
-									>
+									<span v-else class="text-badge-positive-text">✓</span>
 								</td>
 							</tr>
 						</tbody>
@@ -337,7 +334,7 @@
 		<!-- Submit error -->
 		<div
 			v-if="submitError"
-			class="bg-(--color-error-bg) border border-(--color-error-border) rounded-xl px-4 py-3 text-sm text-(--color-error-text) mb-4"
+			class="bg-error-bg border border-error-border rounded-xl px-4 py-3 text-sm text-error-text mb-4"
 		>
 			{{ submitError }}
 		</div>
@@ -350,8 +347,8 @@
 			:class="[
         'inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-[480] tracking-[-0.01em] transition-opacity',
         canSubmit
-          ? 'bg-(--color-ink) text-(--color-canvas) hover:opacity-80 cursor-pointer'
-          : 'bg-(--color-hairline) text-(--color-subtle) cursor-not-allowed',
+          ? 'bg-ink text-(--color-canvas) hover:opacity-80 cursor-pointer'
+          : 'bg-hairline text-subtle cursor-not-allowed',
       ]"
 		>
 			<svg

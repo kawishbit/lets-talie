@@ -22,7 +22,13 @@ interface ImportMetaEnv {
 	readonly DATABASE_URL: string;
 	readonly BETTER_AUTH_SECRET: string;
 	readonly BETTER_AUTH_URL: string;
-	readonly RESEND_API_KEY: string;
+	readonly SMTP_HOST: string;
+	readonly SMTP_PORT: string;
+	readonly SMTP_SECURE: string;
+	readonly SMTP_USER: string;
+	readonly SMTP_PASS: string;
+	readonly SMTP_FROM: string;
+	readonly PUBLIC_CURRENCY_CODE: string;
 }
 
 declare global {

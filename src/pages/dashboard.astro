@@ -8,7 +8,6 @@ if (!Astro.locals.user) {
 	return Astro.redirect("/login");
 }
 const currentUser = Astro.locals.user;
-const isAdmin = currentUser.role === "admin";
 
 const { users, categories } = await fetchUsersAndCategories();
 
@@ -16,26 +15,26 @@ const balance = parseFloat(currentUser.accountBalance ?? "0");
 const balancePositive = balance >= 0;
 const balanceFormatted = new Intl.NumberFormat("en-US", {
 	style: "currency",
-	currency: "USD",
+	currency: import.meta.env.PUBLIC_CURRENCY_CODE ?? "USD",
 	signDisplay: "always",
 }).format(balance);
 ---
 
 <Layout title="Dashboard">
-	<div class="max-w-screen-xl mx-auto px-6 py-10">
+	<div class="max-w-7xl mx-auto px-6 py-10">
 		<!-- Balance block -->
 		<section class="mb-10">
 			<div
 				class:list={[
-                                        "rounded-3xl px-8 py-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4",
-                                        balancePositive
-                                                ? "bg-(--color-block-lime)"
-                                                : "bg-(--color-block-coral)",
-                                ]}
+					"rounded-3xl px-8 py-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4",
+					balancePositive
+						? "bg-(--color-block-lime)"
+						: "bg-(--color-block-coral)",
+				]}
 			>
 				<div>
 					<p
-						class="font-mono text-xs uppercase tracking-widest text-(--color-muted) mb-2"
+						class="font-mono text-xs uppercase tracking-widest text-muted mb-2"
 					>
 						Your balance
 					</p>
@@ -45,10 +44,10 @@ const balanceFormatted = new Intl.NumberFormat("en-US", {
 						{balanceFormatted}
 					</p>
 				</div>
-				<div class="text-sm text-(--color-muted) font-[330] max-w-xs">
+				<div class="text-sm text-muted font-[330] max-w-xs">
 					{balancePositive
-                                                        ? "The group owes you this amount overall."
-                                                        : "You owe this amount to the group overall."}
+							? "The group owes you this amount overall."
+							: "You owe this amount to the group overall."}
 				</div>
 			</div>
 		</section>
@@ -58,16 +57,11 @@ const balanceFormatted = new Intl.NumberFormat("en-US", {
 			<h2 class="text-xl font-[540] tracking-[-0.02em] mb-6">
 				Add a transaction
 			</h2>
-			<div
-				class:list={[
-                                        "grid gap-6",
-                                        isAdmin ? "lg:grid-cols-2" : "",
-                                ]}
-			>
+			<div class="grid gap-6 lg:grid-cols-2">
 				<!-- Group Transaction Form -->
-				<div class="border border-(--color-hairline) rounded-2xl p-6">
+				<div class="border border-hairline rounded-2xl p-6">
 					<p
-						class="font-mono text-xs uppercase tracking-widest text-(--color-muted) mb-1"
+						class="font-mono text-xs uppercase tracking-widest text-muted mb-1"
 					>
 						Group
 					</p>
@@ -82,26 +76,22 @@ const balanceFormatted = new Intl.NumberFormat("en-US", {
 					/>
 				</div>
 
-				<!-- Single Transaction Form (admin only) -->
-				{isAdmin && (
-                                                <div class="border border-(--color-hairline) rounded-2xl p-6">
-                                                        <p class="font-mono text-xs uppercase tracking-widest text-(--color-muted) mb-1">
-                                                                Single
-                                                        </p>
-                                                        <h3 class="font-[540] text-base mb-5">
-                                                                Direct
-                                                                transaction for
-                                                                one person
-                                                        </h3>
-                                                        <SingleTransactionForm
-                                                                client:load
-                                                                users={users}
-                                                                categories={
-                                                                        categories
-                                                                }
-                                                        />
-                                                </div>
-                                        )}
+				<!-- Single Transaction Form -->
+				<div class="border border-hairline rounded-2xl p-6">
+					<p
+						class="font-mono text-xs uppercase tracking-widest text-muted mb-1"
+					>
+						Single
+					</p>
+					<h3 class="font-[540] text-base mb-5">
+						Direct transaction for one person
+					</h3>
+					<SingleTransactionForm
+						client:load
+						users={users}
+						categories={categories}
+					/>
+				</div>
 			</div>
 		</section>
 	</div>
