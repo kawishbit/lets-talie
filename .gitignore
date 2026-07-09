@@ -4,6 +4,12 @@ dist/
 # test coverage reports
 coverage/
 
+# Playwright E2E output
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
 # generated types
 .astro/
 

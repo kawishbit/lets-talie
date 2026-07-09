@@ -13,6 +13,35 @@ services:
     networks:
       - internal
 
+  # Dedicated Postgres for integration tests (`bun run test:integration`,
+  # `bun run test:e2e`) — isolated from dev data. No volume: state resets
+  # whenever the container is recreated.
+  db-test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: letstalie_test
+      POSTGRES_USER: letstalie_test
+      POSTGRES_PASSWORD: letstalie_test
+    ports:
+      - "${DB_TEST_PORT:-5434}:5432"
+    networks:
+      - internal
+    profiles:
+      - test
+
+  # SMTP catcher for integration tests — the passwordless OTP/magic-link
+  # emails the app sends during auth-flow tests land here and are read back
+  # via Mailpit's HTTP API (http://localhost:8026) instead of a real inbox.
+  mailpit-test:
+    image: axllent/mailpit:latest
+    ports:
+      - "${MAILPIT_TEST_SMTP_PORT:-1026}:1025"
+      - "${MAILPIT_TEST_HTTP_PORT:-8026}:8025"
+    networks:
+      - internal
+    profiles:
+      - test
+
   app:
     build: .
     restart: unless-stopped
