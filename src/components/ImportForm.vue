@@ -1,4 +1,5 @@
 <script setup lang="ts">
+	import { parseCsv } from "@lib/csv";
 	import { computed, ref } from "vue";
 
 	interface ParsedRow {
@@ -35,22 +36,6 @@
 	const canSubmit = computed(
 		() => parsedRows.value.length > 0 && !hasErrors.value && !loading.value,
 	);
-
-	function parseCsv(text: string): Record<string, string>[] {
-		const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
-		if (lines.length < 2) return [];
-		const headers = lines[0]
-			.split(",")
-			.map((h) => h.trim().replace(/^"|"$/g, ""));
-		return lines.slice(1).map((line) => {
-			const values = line.match(/(".*?"|[^,]+)(?=,|$)/g) ?? [];
-			const record: Record<string, string> = {};
-			headers.forEach((h, i) => {
-				record[h] = (values[i] ?? "").trim().replace(/^"|"$/g, "");
-			});
-			return record;
-		});
-	}
 
 	function clientValidateRow(row: ParsedRow): string[] {
 		const errors: string[] = [];
