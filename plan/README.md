@@ -14,3 +14,5 @@
 - [PLAN.PHASE_6.md](PLAN.PHASE_6.md) — PWA & Deployment
 - [PLAN.PHASE_7.md](PLAN.PHASE_7.md) — Dark Mode
 - [PLAN.PHASE_8.md](PLAN.PHASE_8.md) — Unit Testing
+- [PLAN.PHASE_9.md](PLAN.PHASE_9.md) — Integration Testing
+- [PLAN.PHASE_10.md](PLAN.PHASE_10.md) — Distribution (Docker, Bare-Metal, Vercel Demo)

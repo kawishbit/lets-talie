@@ -6,6 +6,8 @@ import Layout from "../layouts/Layout.astro";
 if (Astro.locals.user) {
 	return Astro.redirect("/dashboard");
 }
+
+const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true";
 ---
 
 <Layout title="Sign in">
@@ -21,7 +23,9 @@ if (Astro.locals.user) {
 				>
 				<h1 class="text-2xl font-[540] tracking-[-0.02em] mb-2">Sign in</h1>
 				<p class="text-sm text-muted font-[330]">
-					We'll send a magic link to your email.
+					{isDemoMode
+							? "Explore a read-only demo."
+							: "We'll send a magic link to your email."}
 				</p>
 			</div>
 			<LoginForm client:load />

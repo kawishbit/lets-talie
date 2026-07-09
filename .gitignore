@@ -26,3 +26,7 @@ pnpm-debug.log*
 
 # logo
 logo/*lock*
+
+# vercel 
+
+.vercel/

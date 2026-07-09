@@ -7,6 +7,29 @@
 	const loading = ref(false);
 	const step = ref<"email" | "otp">("email");
 	const error = ref("");
+	const demoLoading = ref(false);
+
+	const isDemoMode = import.meta.env.PUBLIC_DEMO_MODE === "true";
+
+	async function handleDemoLogin() {
+		demoLoading.value = true;
+		error.value = "";
+
+		const res = await fetch("/api/auth/demo-login", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: "{}",
+		});
+
+		if (res.ok) {
+			window.location.href = "/dashboard";
+			return;
+		}
+
+		const data = await res.json().catch(() => ({}));
+		error.value = data.error ?? "Demo login is unavailable right now.";
+		demoLoading.value = false;
+	}
 
 	async function handleEmailSubmit() {
 		if (!email.value.trim()) return;
@@ -56,8 +79,31 @@
 </script>
 
 <template>
+	<div v-if="isDemoMode" class="flex flex-col gap-4">
+		<div
+			class="bg-(--color-badge-positive-bg) rounded-2xl px-6 py-5 text-center"
+		>
+			<p class="font-[540] text-base mb-1">This is a read-only demo</p>
+			<p class="text-sm text-label font-[330]">
+				Sign in instantly as a seeded demo account. Nothing you do here is
+				saved.
+			</p>
+		</div>
+
+		<p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+
+		<button
+			type="button"
+			:disabled="demoLoading"
+			@click="handleDemoLogin"
+			class="w-full bg-ink text-canvas py-3 rounded-full text-[15px] font-[480] tracking-[-0.01em] hover:opacity-80 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+		>
+			{{ demoLoading ? 'Signing in…' : 'Continue as Demo' }}
+		</button>
+	</div>
+
 	<form
-		v-if="step === 'email'"
+		v-else-if="step === 'email'"
 		@submit.prevent="handleEmailSubmit"
 		class="flex flex-col gap-4"
 	>

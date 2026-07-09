@@ -9,9 +9,25 @@ const ADMIN_ROUTES = [
 	"/import-transactions",
 	"/approve-transactions",
 ];
+const MUTATING_METHODS = new Set(["POST", "PATCH", "PUT", "DELETE"]);
 
 export const onRequest = defineMiddleware(async (context, next) => {
 	const { pathname } = context.url;
+
+	// Demo mode: block every mutating request to the API, regardless of auth
+	// state — this is enforced here (not just hidden in the UI) since the
+	// demo is publicly reachable.
+	if (
+		import.meta.env.PUBLIC_DEMO_MODE === "true" &&
+		pathname.startsWith("/api/") &&
+		!pathname.startsWith(AUTH_API_PREFIX) &&
+		MUTATING_METHODS.has(context.request.method)
+	) {
+		return Response.json(
+			{ error: "Demo mode: this action is disabled." },
+			{ status: 403 },
+		);
+	}
 
 	const session = await auth.api.getSession({
 		headers: context.request.headers,

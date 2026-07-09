@@ -18,7 +18,7 @@ Short Description: lets-talie is a PWA (Progressive Web Application) to help fri
 ## Database Tables
 
 ### Better Auth Core Schema
-The following tables are part of the Better Auth core schema. Additional fields have been added to the `user` table: role and account_balance.
+The following tables are part of the Better Auth core schema used by the app. The `user` table also exposes additional fields through Better Auth: `role`, `accountBalance`, `banned`, `banReason`, `banExpires`, and `deletedAt`.
 
 #### `user` Table
 
@@ -26,15 +26,19 @@ Stores the core user profile information.
 
 | Field Name | Data Type | Constraints / Description |
 | --- | --- | --- |
-| `id` | `VARCHAR/TEXT` | Primary Key |
-| `name` | `VARCHAR/TEXT` | Not Null |
-| `email` | `VARCHAR/TEXT` | Unique, Not Null |
-| `emailVerified` | `BOOLEAN` | Not Null, Default: `false` |
-| `image` | `VARCHAR/TEXT` | Nullable |
-| `createdAt` | `TIMESTAMP` | Not Null |
-| `updatedAt` | `TIMESTAMP` | Not Null |
-| **`role`** | `VARCHAR/TEXT` | Not Null, Default: `'user'` (Allowed: `'admin'`, `'user'`) |
-| **`account_balance`** | `DECIMAL(10,2)` | Not Null, Default: `0.00` |
+| `id` | `text` | Primary Key |
+| `name` | `text` | Not Null |
+| `email` | `text` | Unique, Not Null |
+| `emailVerified` | `boolean` | Not Null, Default: `false` |
+| `image` | `text` | Nullable |
+| `createdAt` | `timestamp` | Not Null |
+| `updatedAt` | `timestamp` | Not Null |
+| `role` | `text` | Default: `'user'` |
+| `accountBalance` | `text` | Default: `'0.00'` |
+| `banned` | `boolean` | Default: `false` |
+| `banReason` | `text` | Nullable |
+| `banExpires` | `timestamp` | Nullable |
+| `deletedAt` | `timestamp` | Nullable |
 
 ---
 
@@ -44,36 +48,37 @@ Tracks active user sessions.
 
 | Field Name | Data Type | Constraints / Description |
 | --- | --- | --- |
-| `id` | `VARCHAR/TEXT` | Primary Key |
-| `expiresAt` | `TIMESTAMP` | Not Null |
-| `token` | `VARCHAR/TEXT` | Unique, Not Null |
-| `createdAt` | `TIMESTAMP` | Not Null |
-| `updatedAt` | `TIMESTAMP` | Not Null |
-| `ipAddress` | `VARCHAR/TEXT` | Nullable |
-| `userAgent` | `VARCHAR/TEXT` | Nullable |
-| `userId` | `VARCHAR/TEXT` | Foreign Key → `user.id`, On Delete: Cascade |
+| `id` | `text` | Primary Key |
+| `expiresAt` | `timestamp` | Not Null |
+| `token` | `text` | Unique, Not Null |
+| `createdAt` | `timestamp` | Not Null |
+| `updatedAt` | `timestamp` | Not Null |
+| `ipAddress` | `text` | Nullable |
+| `userAgent` | `text` | Nullable |
+| `impersonatedBy` | `text` | Nullable |
+| `userId` | `text` | Foreign Key → `user.id`, On Delete: Cascade |
 
 ---
 
 #### `account` Table
 
-Handles OAuth providers and credentials (e.g., Google, GitHub, or email/password links).
+Handles OAuth providers and credentials (for example Google, GitHub, or email/password links).
 
 | Field Name | Data Type | Constraints / Description |
 | --- | --- | --- |
-| `id` | `VARCHAR/TEXT` | Primary Key |
-| `accountId` | `VARCHAR/TEXT` | Not Null (Provider's user ID) |
-| `providerId` | `VARCHAR/TEXT` | Not Null (e.g., `'google'`, `'credential'`) |
-| `userId` | `VARCHAR/TEXT` | Foreign Key → `user.id`, On Delete: Cascade |
-| `accessToken` | `VARCHAR/TEXT` | Nullable |
-| `refreshToken` | `VARCHAR/TEXT` | Nullable |
-| `idToken` | `VARCHAR/TEXT` | Nullable |
-| `accessTokenExpiresAt` | `TIMESTAMP` | Nullable |
-| `refreshTokenExpiresAt` | `TIMESTAMP` | Nullable |
-| `scope` | `VARCHAR/TEXT` | Nullable |
-| `password` | `VARCHAR/TEXT` | Nullable (Hashed password for email/password auth) |
-| `createdAt` | `TIMESTAMP` | Not Null |
-| `updatedAt` | `TIMESTAMP` | Not Null |
+| `id` | `text` | Primary Key |
+| `accountId` | `text` | Not Null |
+| `providerId` | `text` | Not Null |
+| `userId` | `text` | Foreign Key → `user.id`, On Delete: Cascade |
+| `accessToken` | `text` | Nullable |
+| `refreshToken` | `text` | Nullable |
+| `idToken` | `text` | Nullable |
+| `accessTokenExpiresAt` | `timestamp` | Nullable |
+| `refreshTokenExpiresAt` | `timestamp` | Nullable |
+| `scope` | `text` | Nullable |
+| `password` | `text` | Nullable |
+| `createdAt` | `timestamp` | Not Null |
+| `updatedAt` | `timestamp` | Not Null |
 
 ---
 
@@ -83,29 +88,26 @@ Used for password resets, email verification links, and OTPs.
 
 | Field Name | Data Type | Constraints / Description |
 | --- | --- | --- |
-| `id` | `VARCHAR/TEXT` | Primary Key |
-| `identifier` | `VARCHAR/TEXT` | Not Null (e.g., email address) |
-| `value` | `VARCHAR/TEXT` | Not Null (Token or OTP hash) |
-| `expiresAt` | `TIMESTAMP` | Not Null |
-| `createdAt` | `TIMESTAMP` | Nullable |
-| `updatedAt` | `TIMESTAMP` | Nullable |
+| `id` | `text` | Primary Key |
+| `identifier` | `text` | Not Null |
+| `value` | `text` | Not Null |
+| `expiresAt` | `timestamp` | Not Null |
+| `createdAt` | `timestamp` | Not Null |
+| `updatedAt` | `timestamp` | Not Null |
 
-
-### Transaction schema 
-The following tables are part of the transaction schema for lets-talie. 
+### Transaction schema
+The following tables are part of the app transaction schema for lets-talie.
 
 #### `transaction_categories` Table
 
 | Field Name | Data Type | Constraints / Description |
 | --- | --- | --- |
-| `id` | `uuid` | Primary Key (implicit), Default: `gen_random_uuid()`, Not Null |
+| `id` | `text` | Primary Key |
 | `label` | `text` | Not Null |
-| `createdAt` | `timestamp with time zone` | Default: `now()`, Not Null |
-| `updatedAt` | `timestamp with time zone` | Default: `now()`, Not Null |
-| `createdBy` | `uuid` | Default: `public.request_user_id()` |
-| `updatedBy` | `uuid` | Default: `public.request_user_id()` |
-| `isDeleted` | `boolean` | Default: `false`, Not Null |
 | `remarks` | `text` | Nullable |
+| `createdAt` | `timestamp` | Not Null |
+| `updatedAt` | `timestamp` | Not Null |
+| `deletedAt` | `timestamp` | Nullable |
 
 ---
 
@@ -113,22 +115,21 @@ The following tables are part of the transaction schema for lets-talie.
 
 | Field Name | Data Type | Constraints / Description |
 | --- | --- | --- |
-| `id` | `uuid` | Primary Key (implicit), Default: `gen_random_uuid()`, Not Null |
+| `id` | `text` | Primary Key |
+| `transactionGroupId` | `text` | Nullable |
 | `name` | `text` | Not Null |
-| `transactionRemarks` | `text` | Nullable |
-| `transactionDate` | `date` | Default: `CURRENT_DATE`, Not Null |
-| `paidBy` | `uuid` | Not Null |
-| `amount` | `numeric(12,2)` | Not Null, Check: `amount > 0` |
-| `type` | `text` | Not Null, Check: Must be `'deposit'` or `'withdraw'` |
-| `status` | `text` | Default: `'pending'`, Not Null, Check: Must be `'pending'`, `'completed'`, or `'cancelled'` |
-| `transactionGroupId` | `uuid` | Not Null |
-| `transactionCategoryId` | `uuid` | Nullable |
-| `createdAt` | `timestamp with time zone` | Default: `now()`, Not Null |
-| `updatedAt` | `timestamp with time zone` | Default: `now()`, Not Null |
-| `createdBy` | `uuid` | Default: `public.request_user_id()` |
-| `updatedBy` | `uuid` | Default: `public.request_user_id()` |
-| `isDeleted` | `boolean` | Default: `false`, Not Null |
+| `date` | `timestamp` | Not Null |
 | `remarks` | `text` | Nullable |
+| `amount` | `numeric(10,2)` | Not Null |
+| `type` | `text` | Not Null (for example `'deposit'` or `'withdrawal'`) |
+| `status` | `text` | Not Null, Default: `'pending'` |
+| `createdByUserId` | `text` | Not Null, Foreign Key → `user.id` |
+| `lastUpdatedByUserId` | `text` | Nullable, Foreign Key → `user.id` |
+| `paidByUserId` | `text` | Not Null, Foreign Key → `user.id` |
+| `categoryId` | `text` | Nullable, Foreign Key → `transaction_categories.id` |
+| `createdAt` | `timestamp` | Not Null |
+| `updatedAt` | `timestamp` | Not Null |
+| `deletedAt` | `timestamp` | Nullable |
 
 ## Features
 
@@ -148,6 +149,7 @@ The following tables are part of the transaction schema for lets-talie.
 ### Shared between Admin and User
 - View current balance 
 - Add group transactions (User: pending approval by admin. Admin: approved automatically)
+- Add single transactions (User: pending approval by admin. Admin: approved automatically)
 - View your transactions history (User: only your transactions. Admin: all transactions)
 
 ### Transaction Group calculation and description 

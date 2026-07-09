@@ -29,6 +29,8 @@ interface ImportMetaEnv {
 	readonly SMTP_PASS: string;
 	readonly SMTP_FROM: string;
 	readonly PUBLIC_CURRENCY_CODE: string;
+	readonly PUBLIC_DEMO_MODE: string;
+	readonly DEMO_USER_EMAIL: string;
 }
 
 declare global {

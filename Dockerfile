@@ -14,6 +14,12 @@ FROM oven/bun:1-slim AS runner
 
 WORKDIR /app
 
+# Astro's server.host defaults to false (localhost-only). Inside a container
+# that leaves the app unreachable through Docker's port mapping, so bind to
+# all interfaces here rather than in astro.config.ts (which also governs
+# `astro dev`, where localhost-only is the right default).
+ENV HOST=0.0.0.0
+
 # Copy only what's needed to run
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist

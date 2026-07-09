@@ -1,10 +1,18 @@
+import node from "@astrojs/node";
+import vercel from "@astrojs/vercel";
 import vue from "@astrojs/vue";
 import tailwindcss from "@tailwindcss/vite";
 import AstroPWA from "@vite-pwa/astro";
 import { defineConfig } from "astro/config";
 
+// ADAPTER=vercel -> serverless build for the public demo (Vercel).
+// Anything else (unset) -> standalone Node server for Docker / bare-metal.
+const adapter =
+	process.env.ADAPTER === "vercel" ? vercel() : node({ mode: "standalone" });
+
 export default defineConfig({
 	output: "server",
+	adapter,
 	server: {
 		port: 30001,
 	},

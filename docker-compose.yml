@@ -8,6 +8,8 @@ services:
       POSTGRES_PASSWORD: letstalie
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-5433}:5432"
     networks:
       - internal
 
@@ -27,7 +29,7 @@ services:
       SMTP_PASS: ${SMTP_PASS}
       SMTP_FROM: ${SMTP_FROM}
     ports:
-      - "30001:30001"
+      - "${APP_PORT:-30001}:30001"
     networks:
       - internal
 

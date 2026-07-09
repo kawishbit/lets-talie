@@ -3,8 +3,11 @@ import { db } from "@db/database";
 import * as schema from "@db/schema";
 import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins";
+import { demoLogin } from "./demo-auth";
 import { sendMail } from "./mailer";
 import { passwordlessBundle } from "./passwordless";
+
+const demoModeEnabled = process.env.PUBLIC_DEMO_MODE === "true";
 
 export const auth = betterAuth({
 	appName: "lets-talie",
@@ -22,6 +25,10 @@ export const auth = betterAuth({
 	},
 	plugins: [
 		admin(),
+		demoLogin({
+			enabled: demoModeEnabled,
+			userEmail: process.env.DEMO_USER_EMAIL,
+		}),
 		passwordlessBundle({
 			disableSignUp: true,
 			sendEmail: async ({
