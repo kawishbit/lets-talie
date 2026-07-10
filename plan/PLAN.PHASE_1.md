@@ -3,7 +3,7 @@
 - [x] Astro project created
 - [x] PWA integration (`@vite-pwa/astro`)
 - [x] Better Auth installed with Drizzle adapter and magic link plugin
-- [x] Drizzle ORM configured for PostgreSQL (Bun SQL driver)
+- [x] Drizzle ORM configured for PostgreSQL (~~Bun SQL driver~~ → postgres-js driver, since the Node migration)
 - [x] Auth middleware (session injection into `context.locals`)
 - [x] Auth API catch-all route (`src/pages/api/auth/[...all].ts`)
 - [x] Install Vue integration (`@astrojs/vue`, `vue`)

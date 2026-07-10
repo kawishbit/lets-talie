@@ -7,8 +7,20 @@
  */
 const MAILPIT_URL = `http://localhost:${process.env.MAILPIT_TEST_HTTP_PORT ?? "8026"}`;
 
-const OTP_REGEX = /font-size:24px;letter-spacing:4px">(\d+)</;
+const OTP_REGEX = /letter-spacing:8px;color:#0a0a0a;">(\d+)</;
 const MAGIC_LINK_REGEX = /href="([^"]+passwordless-bundle\/verify\?[^"]+)"/;
+
+/** The email template HTML-escapes attribute values, so the extracted href
+ * carries entities (notably `&amp;` between query params). Decode them back to
+ * a usable URL. */
+function decodeHtmlEntities(value: string): string {
+	return value
+		.replace(/&amp;/g, "&")
+		.replace(/&quot;/g, '"')
+		.replace(/&#39;/g, "'")
+		.replace(/&lt;/g, "<")
+		.replace(/&gt;/g, ">");
+}
 
 export async function clearInbox(): Promise<void> {
 	await fetch(`${MAILPIT_URL}/api/v1/messages`, { method: "DELETE" });
@@ -46,7 +58,10 @@ export async function waitForLoginEmail(
 			const otpMatch = html.match(OTP_REGEX);
 			const linkMatch = html.match(MAGIC_LINK_REGEX);
 			if (otpMatch && linkMatch) {
-				return { otp: otpMatch[1], magicLinkUrl: linkMatch[1] };
+				return {
+					otp: otpMatch[1],
+					magicLinkUrl: decodeHtmlEntities(linkMatch[1]),
+				};
 			}
 		}
 		await new Promise((r) => setTimeout(r, 150));

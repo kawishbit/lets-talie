@@ -1,12 +1,12 @@
 import nodemailer from "nodemailer";
 
 export const transporter = nodemailer.createTransport({
-	host: Bun.env.SMTP_HOST,
-	port: Number(Bun.env.SMTP_PORT ?? 587),
-	secure: Bun.env.SMTP_SECURE === "true",
+	host: process.env.SMTP_HOST,
+	port: Number(process.env.SMTP_PORT ?? 587),
+	secure: process.env.SMTP_SECURE === "true",
 	auth: {
-		user: Bun.env.SMTP_USER,
-		pass: Bun.env.SMTP_PASS,
+		user: process.env.SMTP_USER,
+		pass: process.env.SMTP_PASS,
 	},
 });
 
@@ -16,7 +16,7 @@ export async function sendMail(options: {
 	html: string;
 }) {
 	await transporter.sendMail({
-		from: Bun.env.SMTP_FROM,
+		from: process.env.SMTP_FROM,
 		...options,
 	});
 }

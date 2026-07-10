@@ -1,10 +1,8 @@
 /**
- * `bun run test:integration` invokes the `vitest` binary, which has a
- * `#!/usr/bin/env node` shebang — so vitest's own process (and therefore its
- * config file evaluation and `globalSetup`) runs under plain Node, not Bun,
- * and never gets Bun's automatic `.env` loading. Import this first, anywhere
- * `process.env.TEST_DATABASE_URL` / `BETTER_AUTH_SECRET` / etc. are read
- * outside of a Vitest worker (which does inherit `test.env`).
+ * The test orchestrators and Vitest run under Node, which — unlike Bun — does
+ * not automatically load `.env`. Load it explicitly here and import this first,
+ * anywhere `process.env.TEST_DATABASE_URL` / `BETTER_AUTH_SECRET` / etc. are
+ * read outside of a Vitest worker (which does inherit `test.env`).
  */
 try {
 	process.loadEnvFile();

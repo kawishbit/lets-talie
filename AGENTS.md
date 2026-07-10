@@ -5,7 +5,7 @@ PWA for splitting group expenses between friends and family, with automatic bala
 ## Rules
 
 - **Confirm before adding dependencies.** Ask before introducing any new package/library — avoids bloat, keeps the project maintainable.
-- **Bun only.** Never use `node`, `npm`, or `npx` — always `bun`/`bunx`, including for the scripts below.
+- **Bun for tooling, Node for the runtime.** Use `bun`/`bunx` for installing deps and running scripts (never `npm`/`npx`). But the app *runs* on Node — the server is started with `node ./dist/server/entry.mjs` (see the `start` script and Dockerfile), and the DB layer must stay Node-compatible: `src/db/database.ts` uses `drizzle-orm/postgres-js` + `process.env` (never `drizzle-orm/bun-sql` or the `Bun.env`/`Bun.*` globals, which break on Vercel's Node runtime).
 - **No AI attribution in commits.** Do not add `Co-Authored-By: Claude` or similar trailers to commit messages.
 - **Respect `.gitignore`.** Never stage or commit ignored files (`.env`, `dist/`, `.vercel/`, etc).
 - **Ask when unclear.** Confirm requirements and raise questions before implementing rather than guessing.
@@ -20,7 +20,7 @@ PWA for splitting group expenses between friends and family, with automatic bala
 | `build` | Production build — Node adapter by default, `ADAPTER=vercel` for the Vercel build |
 | `preview` | Preview a production build locally |
 | `migrate` | Apply Drizzle migrations |
-| `start` | Run a built server (`build` first) |
+| `start` | Run a built server under Node — `node ./dist/server/entry.mjs` (`build` first) |
 | `seed:demo` | Seed the demo account + sample data (`DEMO_USER_EMAIL` required) |
 | `format` | Format with Biome |
 | `lint` | Lint with Biome |
@@ -30,7 +30,7 @@ PWA for splitting group expenses between friends and family, with automatic bala
 
 ## Tech stack
 
-Astro (Vue islands) · Tailwind CSS · Drizzle ORM + Postgres · Better Auth · Bun · TypeScript · PWA (service worker, offline support)
+Astro (Vue islands) · Tailwind CSS · Drizzle ORM + Postgres (postgres-js driver) · Better Auth · Node runtime · Bun (package manager / task runner) · TypeScript · PWA (service worker, offline support)
 
 ## Database
 

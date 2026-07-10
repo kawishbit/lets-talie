@@ -6,6 +6,8 @@ Replaced the **externally-managed** test infrastructure (the `db-test` + `mailpi
 
 > **Status: done.** All 96 API integration tests, all 31 E2E tests, and all 170 unit tests pass. The final architecture differs substantially from the plan text below (11d–11f) due to a hard blocker discovered mid-implementation — see "What actually shipped" at the end of this file for the real design and why it changed. Left the original plan text in place above that section since the *reasoning trail* (what was tried, what failed, why) is worth keeping for future readers hitting the same wall.
 
+> **⚠️ Superseded (Node migration).** Several facts below are Bun-specific and no longer hold: the app runtime moved from Bun to Node (`drizzle-orm/bun-sql` → `drizzle-orm/postgres-js` + `process.env`, because `bun-sql`'s `import "bun"` crashes on Vercel's Node runtime). Concretely, as of the migration: (a) the app now **has** a Postgres client dependency, `postgres` (postgres-js) — see 11b below, which is now wrong; (b) the orchestrators run via `tsx`, spawn the app server with `node`, and launch migrate/vitest/playwright via plain `bunx` (no `--bun`); (c) the "testcontainers hangs under Bun" workaround (11a) is moot for the app runtime — container provisioning still runs in its own `node` child process, but as a clean boundary, not a Bun escape hatch. The "flip the process hierarchy" fix for the *Vitest* hang (in "What actually shipped") still stands. Bun remains the package manager / task runner only.
+
 ## 11a — Spike: confirm testcontainers runs under our runtime
 
 - [x] Confirmed a Docker daemon is reachable (`docker info`).
@@ -16,7 +18,7 @@ Replaced the **externally-managed** test infrastructure (the `db-test` + `mailpi
 ## 11b — Dependencies
 
 - [x] User confirmed adding two devDependencies: `testcontainers` and `@testcontainers/postgresql`, installed via `bun add -d` (never npm/npx).
-- [x] No `pg`/`postgres` client dependency needed — migrations and the app server still talk to Postgres via the existing `drizzle-orm/bun-sql`, just pointed at the container's connection URI instead of a static one.
+- [x] ~~No `pg`/`postgres` client dependency needed — migrations and the app server still talk to Postgres via the existing `drizzle-orm/bun-sql`, just pointed at the container's connection URI instead of a static one.~~ **Superseded (Node migration):** the app now uses `drizzle-orm/postgres-js` and declares the `postgres` client as a dependency.
 
 ## 11c — Shared container helper
 
@@ -43,7 +45,7 @@ Also observed, and initially misleading: even a `setTimeout`-based external time
 
 The fix: **flip the process hierarchy.** Instead of Vitest/Playwright spawning the container-provisioning child from inside their own `globalSetup`, a plain Bun script now provisions the containers as the **top-level process** and spawns Vitest/Playwright as *its* child — inheriting `DATABASE_URL` (and friends) via ordinary OS process-env inheritance, no `provide()`/`inject()` machinery needed at all.
 
-- [x] `package.json`: `test:integration` → `bun run src/__integration__/run-integration.ts` (was `bunx --bun vitest run --config ...`). `test:e2e` → `bun run src/__integration__/e2e/run-e2e.ts` (was `bunx --bun playwright test`).
+- [x] `package.json`: `test:integration` → `bun run src/__integration__/run-integration.ts` (was `bunx --bun vitest run --config ...`). `test:e2e` → `bun run src/__integration__/e2e/run-e2e.ts` (was `bunx --bun playwright test`). _(Node migration: both now run via `tsx …run-*.ts` instead of `bun run`.)_
 - [x] [`src/__integration__/run-integration.ts`](../src/__integration__/run-integration.ts) (new) — the orchestrator for the Vitest integration suite. In order: `provisionContainers()` → `drizzle-kit migrate` against the container URI → `astro build` → spawn the standalone server (`bun dist/server/entry.mjs`) against the container DB + Mailpit → wait for it to respond → spawn `bunx --bun vitest run --config vitest.integration.config.ts` as a child, with `DATABASE_URL` / `MAILPIT_TEST_HTTP_PORT` set on its env → propagate its exit code → tear down the server, then the containers (`try`/`finally` at each level so teardown always runs).
 - [x] [`src/__integration__/e2e/run-e2e.ts`](../src/__integration__/e2e/run-e2e.ts) (new) — same idea for Playwright, simpler: `provisionContainers()` → migrate → spawn `bunx --bun playwright test` as a child with `DATABASE_URL`/`SMTP_HOST`/`SMTP_PORT`/`MAILPIT_TEST_HTTP_PORT` set. Playwright's own `webServer` (build + run the standalone server) and worker processes inherit those from there — no globalSetup needed for containers at all.
 - [x] `vitest.integration.config.ts` — back to simple: reads `DATABASE_URL` from `process.env` (set by the orchestrator before spawning), throws a clear error if missing (i.e. someone ran `vitest run` directly instead of via `bun run test:integration`). No `globalSetup`, no `env-bridge.ts`, no `ProvidedContext` type augmentation — all deleted, none of it was needed once the hierarchy flipped.

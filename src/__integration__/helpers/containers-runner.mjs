@@ -1,11 +1,11 @@
 /**
- * testcontainers-node's Docker interaction hangs indefinitely under the Bun
- * runtime in this project (confirmed via a spike: identical container-start
- * code returns in seconds under plain Node, never resolves under
- * `bunx --bun`) — so this file is the *only* place `testcontainers` /
- * `@testcontainers/postgresql` are imported, and it is always invoked as a
- * standalone plain-`node` child process (see `../helpers/containers.ts`),
- * never imported directly into Bun-run code.
+ * This file is the *only* place `testcontainers` / `@testcontainers/postgresql`
+ * are imported, and it is always invoked as a standalone `node` child process
+ * (see `../helpers/containers.ts`). Historically this isolation was required
+ * because testcontainers-node's Docker interaction hung indefinitely under the
+ * Bun runtime; the app now runs on Node throughout, but keeping container
+ * provisioning in its own child process is retained as a clean boundary
+ * (folding it into the orchestrators is a possible future cleanup).
  *
  * Protocol with the parent process:
  *  - stdout: emits exactly one `READY <json>` line once both containers are

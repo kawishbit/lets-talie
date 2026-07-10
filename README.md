@@ -12,9 +12,9 @@ A negative balance means you owe the group; a positive balance means the group o
 
 - [Astro](https://docs.astro.build) with a [Vue](https://docs.astro.build/en/guides/framework-components/) integration for interactive islands
 - [Tailwind CSS](https://docs.astro.build/en/guides/styling/) — see [DESIGN.md](DESIGN.md) for UI conventions before touching components or pages
-- [Drizzle ORM](https://orm.drizzle.team/) over Postgres
+- [Drizzle ORM](https://orm.drizzle.team/) over Postgres (via the `postgres-js` driver)
 - [Better Auth](https://www.better-auth.com/) (passwordless email OTP / magic link)
-- [Bun](https://bun.sh) as the runtime and package manager
+- [Node](https://nodejs.org) (22+) as the app runtime; [Bun](https://bun.sh) as the package manager and task runner
 - PWA support via service worker (offline shell, installable)
 
 ## Development

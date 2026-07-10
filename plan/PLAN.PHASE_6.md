@@ -34,6 +34,7 @@
   - Use official `oven/bun` base image
   - Multi-stage: build stage (`bunx --bun astro build`), then slim runtime stage
   - Entrypoint runs `bun run drizzle-kit migrate` then starts the server
+  - **Superseded (Node migration):** build stage stays on `oven/bun`, but the **runtime** stage is now `node:22-slim` and the entrypoint runs `./node_modules/.bin/drizzle-kit migrate && node --env-file-if-exists=.env dist/server/entry.mjs` — the app runs on Node, not Bun.
 - [x] Create `docker-compose.yml`:
   - `db` service: `postgres:16-alpine`, volume for persistence, internal network
   - `app` service: built from local Dockerfile (or GHCR image), depends on `db`

@@ -15,7 +15,7 @@ export default getViteConfig({
 		environment: "node",
 		globals: true,
 		// Points the app's own `db` singleton (src/db/database.ts reads
-		// Bun.env.DATABASE_URL at import time) at the dedicated test database
+		// process.env.DATABASE_URL at import time) at the dedicated test database
 		// for every file in this run — both for direct-DB assertions here and
 		// for the business-logic calls Phase 8's mocked tests can't exercise.
 		env: {

@@ -10,7 +10,7 @@ COPY . .
 RUN bunx --bun astro build
 
 # ── Runtime stage ───────────────────────────────────────────────────────────────
-FROM oven/bun:1-slim AS runner
+FROM node:22-slim AS runner
 
 WORKDIR /app
 
@@ -32,4 +32,4 @@ COPY --from=builder /app/package.json ./package.json
 EXPOSE 30001
 
 # Run migrations then start the server
-CMD ["sh", "-c", "bunx drizzle-kit migrate && bun dist/server/entry.mjs"]
+CMD ["sh", "-c", "./node_modules/.bin/drizzle-kit migrate && node --env-file-if-exists=.env dist/server/entry.mjs"]

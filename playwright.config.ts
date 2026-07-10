@@ -45,7 +45,7 @@ export default defineConfig({
 	// background-dev-server singleton would conflict with a real dev server
 	// the user has running).
 	webServer: {
-		command: "bun run build && bun ./dist/server/entry.mjs",
+		command: "bun run build && node ./dist/server/entry.mjs",
 		url: BASE_URL,
 		reuseExistingServer: false,
 		timeout: 60_000,

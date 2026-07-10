@@ -1,5 +1,5 @@
 /**
- * Classifies errors surfaced from Postgres/Bun.SQL so the app can show a
+ * Classifies errors surfaced from Postgres/postgres-js so the app can show a
  * clear, actionable message instead of a bare "Failed to get session".
  *
  * Drizzle and Better Auth both wrap the underlying driver error (as `.cause`),
@@ -14,7 +14,9 @@ export function describeDbError(err: unknown): string | null {
 			code === "ECONNREFUSED" ||
 			code === "ENOTFOUND" ||
 			code === "ETIMEDOUT" ||
-			code === "ERR_POSTGRES_CONNECTION_CLOSED"
+			code === "CONNECTION_CLOSED" ||
+			code === "CONNECTION_ENDED" ||
+			code === "CONNECT_TIMEOUT"
 		) {
 			return (
 				"Could not connect to the database. Make sure Postgres is running " +

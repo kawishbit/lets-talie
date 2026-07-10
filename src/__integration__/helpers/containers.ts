@@ -1,11 +1,9 @@
 /**
  * Provisions a throwaway Postgres + Mailpit via testcontainers-node for the
  * integration/E2E test run. All actual `testcontainers` calls happen in
- * `./containers-runner.mjs`, spawned here as a plain-`node` child process —
- * see that file's header comment for why (testcontainers hangs under Bun in
- * this project). This module only talks to that child over stdio and never
- * imports `testcontainers` directly, so it's safe to import from
- * Bun-run globalSetup files.
+ * `./containers-runner.mjs`, spawned here as a `node` child process — see
+ * that file's header comment for why. This module only talks to that child
+ * over stdio and never imports `testcontainers` directly.
  */
 import { spawn } from "node:child_process";
 import { createInterface } from "node:readline";

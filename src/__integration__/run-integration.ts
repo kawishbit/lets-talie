@@ -1,6 +1,6 @@
 /**
- * Orchestrator for `bun run test:integration` — replaces invoking `vitest`
- * directly. Provisions the test Postgres + Mailpit via testcontainers,
+ * Orchestrator for `test:integration` (run via `tsx`) — replaces invoking
+ * `vitest` directly. Provisions the test Postgres + Mailpit via testcontainers,
  * applies migrations, builds + starts the app, THEN spawns `vitest run` as
  * a child (inheriting `DATABASE_URL` / `MAILPIT_TEST_HTTP_PORT` via normal
  * process env inheritance), and tears everything down afterwards.
@@ -8,9 +8,9 @@
  * This exists because calling `provisionContainers()` from *inside* Vitest's
  * own `globalSetup` reliably hangs in this project: the exact same
  * testcontainers call that resolves in ~1-2s when run as a plain top-level
- * `bun`/`node` script never resolves when Vitest is anywhere in the process
- * tree — reproduced identically with both the project's real (Astro-wrapped)
- * vitest config and a bare `defineConfig` from "vitest/config" with no Astro
+ * script never resolves when Vitest is anywhere in the process tree —
+ * reproduced identically with both the project's real (Astro-wrapped) vitest
+ * config and a bare `defineConfig` from "vitest/config" with no Astro
  * involved, which rules out Astro's `getViteConfig` and implicates Vitest
  * itself. Running container provisioning as the true top-level process
  * (with Vitest spawned as ITS child, never the reverse) sidesteps whatever
@@ -77,11 +77,10 @@ async function main() {
 
 	try {
 		console.log("[integration] applying migrations to test database...");
-		const migrateExitCode = await run(
-			"bunx",
-			["--bun", "drizzle-kit", "migrate"],
-			{ ...process.env, DATABASE_URL: containers.postgresUri },
-		);
+		const migrateExitCode = await run("bunx", ["drizzle-kit", "migrate"], {
+			...process.env,
+			DATABASE_URL: containers.postgresUri,
+		});
 		if (migrateExitCode !== 0) {
 			throw new Error(
 				`drizzle-kit migrate exited with code ${migrateExitCode}`,
@@ -89,7 +88,7 @@ async function main() {
 		}
 
 		console.log("[integration] building app...");
-		const buildExitCode = await run("bunx", ["--bun", "astro", "build"], {
+		const buildExitCode = await run("bunx", ["astro", "build"], {
 			...process.env,
 			DATABASE_URL: containers.postgresUri,
 			PUBLIC_DEMO_MODE: "false",
@@ -99,7 +98,7 @@ async function main() {
 		}
 
 		console.log(`[integration] starting test server on ${BASE_URL}...`);
-		const server = spawn("bun", ["./dist/server/entry.mjs"], {
+		const server = spawn("node", ["./dist/server/entry.mjs"], {
 			cwd: process.cwd(),
 			env: {
 				...process.env,
@@ -141,7 +140,7 @@ async function main() {
 			console.log("[integration] running vitest...");
 			const vitestExitCode = await run(
 				"bunx",
-				["--bun", "vitest", "run", "--config", "vitest.integration.config.ts"],
+				["vitest", "run", "--config", "vitest.integration.config.ts"],
 				{
 					...process.env,
 					DATABASE_URL: containers.postgresUri,
