@@ -16,6 +16,7 @@
 		"lint": "bunx --bun @biomejs/biome lint",
 		"check": "bunx --bun @biomejs/biome check",
 		"check:fix": "bunx --bun @biomejs/biome check --fix",
+		"typecheck": "bunx tsc --noEmit",
 		"astro": "bunx --bun astro",
 		"test": "vitest run",
 		"test:watch": "vitest",

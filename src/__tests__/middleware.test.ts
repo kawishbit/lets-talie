@@ -1,14 +1,24 @@
 // @vitest-environment node
 import { auth } from "@lib/auth";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { checkDbHealth } from "@lib/db-health";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@lib/auth", () => ({
 	auth: { api: { getSession: vi.fn() } },
 }));
 
+vi.mock("@lib/db-health", () => ({
+	checkDbHealth: vi.fn(),
+}));
+
 const { onRequest } = await import("../middleware");
 
 const mockGetSession = vi.mocked(auth.api.getSession);
+const mockCheckDbHealth = vi.mocked(checkDbHealth);
+
+beforeEach(() => {
+	mockCheckDbHealth.mockResolvedValue(null);
+});
 
 function makeContext(pathname: string, opts: { method?: string } = {}) {
 	const url = new URL(`http://localhost${pathname}`);
@@ -39,14 +49,14 @@ describe("middleware", () => {
 	it("allows unauthenticated access to /", async () => {
 		mockGetSession.mockResolvedValue(null);
 		const { context } = makeContext("/");
-		const res = await onRequest(context as never, next);
+		const res = (await onRequest(context as never, next)) as Response;
 		expect(res.status).toBe(200);
 	});
 
 	it("allows unauthenticated access to /login", async () => {
 		mockGetSession.mockResolvedValue(null);
 		const { context } = makeContext("/login");
-		const res = await onRequest(context as never, next);
+		const res = (await onRequest(context as never, next)) as Response;
 		expect(res.status).toBe(200);
 	});
 
@@ -114,7 +124,7 @@ describe("middleware", () => {
 			session: { id: "s1" },
 		} as never);
 		const { context } = makeContext("/dashboard");
-		const res = await onRequest(context as never, next);
+		const res = (await onRequest(context as never, next)) as Response;
 		expect(res.status).toBe(200);
 	});
 
@@ -124,8 +134,52 @@ describe("middleware", () => {
 			session: { id: "s1" },
 		} as never);
 		const { context } = makeContext("/users");
-		const res = await onRequest(context as never, next);
+		const res = (await onRequest(context as never, next)) as Response;
 		expect(res.status).toBe(200);
+	});
+
+	describe("database errors", () => {
+		it("returns 503 without calling getSession when the DB health check fails", async () => {
+			mockCheckDbHealth.mockResolvedValue(
+				"Could not connect to the database. Make sure Postgres is running " +
+					"and DATABASE_URL in your .env is correct.",
+			);
+			const { context } = makeContext("/dashboard");
+			const res = (await onRequest(context as never, next)) as Response;
+			expect(res.status).toBe(503);
+			expect(await res.text()).toMatch(/postgres is running/i);
+			expect(mockGetSession).not.toHaveBeenCalled();
+		});
+
+		it("returns 503 with a clear message when the schema isn't migrated", async () => {
+			mockCheckDbHealth.mockResolvedValue(
+				"Database schema is not migrated (missing tables). Run `bun run migrate`.",
+			);
+			const { context } = makeContext("/dashboard");
+			const res = (await onRequest(context as never, next)) as Response;
+			expect(res.status).toBe(503);
+			expect(await res.text()).toMatch(/bun run migrate/);
+		});
+
+		it("falls back to catching a getSession rejection if the health check passes but getSession still fails", async () => {
+			mockGetSession.mockRejectedValue(
+				Object.assign(new Error("connect ECONNREFUSED"), {
+					code: "ECONNREFUSED",
+				}),
+			);
+			const { context } = makeContext("/dashboard");
+			const res = (await onRequest(context as never, next)) as Response;
+			expect(res.status).toBe(503);
+			expect(await res.text()).toMatch(/postgres is running/i);
+		});
+
+		it("rethrows unrecognized getSession errors", async () => {
+			mockGetSession.mockRejectedValue(new Error("something else"));
+			const { context } = makeContext("/dashboard");
+			await expect(onRequest(context as never, next)).rejects.toThrow(
+				"something else",
+			);
+		});
 	});
 
 	describe("demo mode", () => {
@@ -142,7 +196,7 @@ describe("middleware", () => {
 			const { context } = makeContext("/api/transactions/single", {
 				method: "POST",
 			});
-			const res = await onRequest(context as never, next);
+			const res = (await onRequest(context as never, next)) as Response;
 			expect(res.status).toBe(403);
 			expect(next).not.toHaveBeenCalled();
 		});
@@ -153,7 +207,7 @@ describe("middleware", () => {
 			const { context } = makeContext("/api/auth/sign-out", {
 				method: "POST",
 			});
-			const res = await onRequest(context as never, next);
+			const res = (await onRequest(context as never, next)) as Response;
 			expect(res.status).toBe(200);
 		});
 
@@ -164,7 +218,7 @@ describe("middleware", () => {
 				session: { id: "s1" },
 			} as never);
 			const { context } = makeContext("/api/categories", { method: "GET" });
-			const res = await onRequest(context as never, next);
+			const res = (await onRequest(context as never, next)) as Response;
 			expect(res.status).toBe(200);
 		});
 	});
