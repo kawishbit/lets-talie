@@ -1,0 +1,309 @@
+<title>lets-talie — repository banner</title>
+<meta name="color-scheme" content="light">
+<style>
+  :root{
+    --bg-cream:#FBF7EC;
+    --bg-mint:#E9F6EE;
+    --bg-gold-wash:#FFF2D2;
+    --ink:#0B4A34;
+    --ink-soft:#3E6D5C;
+    --gold:#FFD300;
+    --gold-deep:#E8B800;
+    --card-border:#E7DEC4;
+    --page-bg:#F4F0E4;
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--bg-cream);
+  }
+
+  .page{
+    width:1200px;
+    height:400px;
+    font-family:-apple-system,"SF Pro Text",Inter,"Segoe UI",system-ui,sans-serif;
+  }
+
+  .banner-wrap{
+    width:1200px;
+    container-type:inline-size;
+  }
+
+  .banner{
+    position:relative;
+    width:1200px;
+    height:400px;
+    overflow:hidden;
+    background:var(--bg-cream);
+  }
+
+  .scene{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    display:block;
+  }
+
+  .content{
+    position:absolute;
+    left:4.7cqw;
+    top:0;
+    bottom:0;
+    width:34cqw;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:1.3cqw;
+  }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:0.6cqw;
+    align-self:flex-start;
+    font-family:ui-monospace,"SF Mono","JetBrains Mono",Menlo,monospace;
+    font-size:1.05cqw;
+    letter-spacing:0.16cqw;
+    text-transform:uppercase;
+    color:var(--ink);
+    background:var(--gold);
+    padding:0.55cqw 1.15cqw;
+    border-radius:99px;
+    font-weight:600;
+  }
+
+  .title{
+    margin:0;
+    font-size:5cqw;
+    line-height:0.98;
+    font-weight:800;
+    letter-spacing:-0.12cqw;
+    color:var(--ink);
+    text-wrap:balance;
+  }
+
+  .tagline{
+    margin:0;
+    font-size:1.5cqw;
+    line-height:1.5;
+    font-weight:450;
+    color:var(--ink-soft);
+    max-width:29cqw;
+  }
+
+  .chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.7cqw;
+    margin-top:0.4cqw;
+  }
+
+  .chip{
+    font-size:1.02cqw;
+    font-weight:600;
+    color:var(--ink);
+    background:rgba(11,74,52,0.07);
+    border:1px solid rgba(11,74,52,0.14);
+    padding:0.55cqw 1.05cqw;
+    border-radius:99px;
+    letter-spacing:0.01cqw;
+  }
+
+  @media (prefers-reduced-motion:no-preference){
+    .node-glow{
+      transform-origin:center;
+      animation:pulse 4.5s ease-in-out infinite;
+    }
+    .node-glow:nth-of-type(2n){ animation-delay:-1.4s; }
+    .node-glow:nth-of-type(3n){ animation-delay:-2.6s; }
+  }
+  @keyframes pulse{
+    0%,100%{ opacity:0.55; }
+    50%{ opacity:0.95; }
+  }
+</style>
+
+<div class="page">
+  <div class="banner-wrap">
+    <div class="banner">
+      <svg class="scene" viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FBF7EC"/>
+            <stop offset="45%" stop-color="#F3F2E6"/>
+            <stop offset="72%" stop-color="#E9F6EE"/>
+            <stop offset="100%" stop-color="#FFF2D2"/>
+          </linearGradient>
+
+          <radialGradient id="goldGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFE38A" stop-opacity="0.9"/>
+            <stop offset="55%" stop-color="#FFD300" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#FFD300" stop-opacity="0"/>
+          </radialGradient>
+
+          <linearGradient id="topFace" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFE788"/>
+            <stop offset="100%" stop-color="#FFD300"/>
+          </linearGradient>
+          <linearGradient id="leftFace" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2E6E56"/>
+            <stop offset="100%" stop-color="#1D5643"/>
+          </linearGradient>
+          <linearGradient id="rightFace" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#123D2F"/>
+            <stop offset="100%" stop-color="#0B4A34"/>
+          </linearGradient>
+
+          <pattern id="isoGrid" width="46" height="80" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+            <line x1="0" y1="0" x2="0" y2="80" stroke="#0B4A34" stroke-width="1" stroke-opacity="0.05"/>
+          </pattern>
+          <pattern id="isoGrid2" width="46" height="80" patternUnits="userSpaceOnUse" patternTransform="rotate(-30)">
+            <line x1="0" y1="0" x2="0" y2="80" stroke="#0B4A34" stroke-width="1" stroke-opacity="0.05"/>
+          </pattern>
+
+          <radialGradient id="gridFade" cx="66%" cy="50%" r="65%">
+            <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+          </radialGradient>
+          <mask id="gridMask">
+            <rect x="0" y="0" width="1200" height="400" fill="url(#gridFade)"/>
+          </mask>
+
+          <filter id="blurLg" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="22"/>
+          </filter>
+          <filter id="blurMd" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="9"/>
+          </filter>
+          <filter id="blurSm" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="4"/>
+          </filter>
+          <filter id="boxGlow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="6" result="b"/>
+            <feMerge>
+              <feMergeNode in="b"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- background -->
+        <rect x="0" y="0" width="1200" height="400" fill="url(#bgGrad)"/>
+        <g mask="url(#gridMask)">
+          <rect x="420" y="0" width="780" height="400" fill="url(#isoGrid)"/>
+          <rect x="420" y="0" width="780" height="400" fill="url(#isoGrid2)"/>
+        </g>
+
+        <!-- soft bokeh lighting -->
+        <circle cx="1120" cy="60" r="130" fill="#FFE38A" opacity="0.35" filter="url(#blurLg)"/>
+        <circle cx="520" cy="360" r="110" fill="#BDEBD8" opacity="0.4" filter="url(#blurLg)"/>
+        <circle cx="980" cy="360" r="90" fill="#FFC9B0" opacity="0.28" filter="url(#blurLg)"/>
+
+        <!-- connection threads -->
+        <g fill="none" stroke="#0B4A34" stroke-opacity="0.22" stroke-width="1.6" stroke-linecap="round">
+          <path d="M800,110 Q850,58 900,60"/>
+          <path d="M800,110 Q705,58 630,80"/>
+          <path d="M882.27,157.5 Q950,88 1000,70"/>
+          <path d="M882.27,157.5 Q1000,142 1100,150"/>
+          <path d="M800,300 Q950,322 1080,290"/>
+          <path d="M800,300 Q880,342 960,340"/>
+          <path d="M717.73,157.5 Q640,148 560,190"/>
+          <path d="M717.73,252.5 Q660,298 610,320"/>
+          <path d="M1000,70 Q1060,88 1100,150"/>
+          <path d="M1100,150 Q1112,222 1080,290"/>
+          <path d="M630,80 Q590,108 560,190"/>
+        </g>
+
+        <!-- ground shadow -->
+        <ellipse cx="800" cy="311" rx="105" ry="16" fill="#0B4A34" opacity="0.14" filter="url(#blurMd)"/>
+
+        <!-- box glow halo -->
+        <ellipse cx="800" cy="200" rx="185" ry="155" fill="url(#goldGlow)" filter="url(#blurLg)"/>
+
+        <!-- isometric repository box -->
+        <g filter="url(#boxGlow)">
+          <path d="M717.73,157.5 L800,205 L800,300 L717.73,252.5 Z" fill="url(#leftFace)"/>
+          <path d="M882.27,157.5 L800,205 L800,300 L882.27,252.5 Z" fill="url(#rightFace)"/>
+
+          <!-- simple git-graph motif on the right face -->
+          <g stroke="#FFF6D6" stroke-opacity="0.4" stroke-width="1.4" fill="none">
+            <path d="M818,190 L818,270"/>
+            <path d="M818,215 L850,232"/>
+            <path d="M850,232 L850,262"/>
+          </g>
+          <circle cx="818" cy="190" r="3" fill="#FFD300" opacity="0.85"/>
+          <circle cx="818" cy="228" r="3" fill="#FFF6D6" opacity="0.7"/>
+          <circle cx="850" cy="232" r="3" fill="#FFD300" opacity="0.7"/>
+          <circle cx="818" cy="270" r="3" fill="#FFF6D6" opacity="0.7"/>
+          <circle cx="850" cy="262" r="3" fill="#FFD300" opacity="0.6"/>
+
+          <path d="M800,110 L882.27,157.5 L800,205 L717.73,157.5 Z" fill="url(#topFace)"/>
+
+          <!-- logo decal mapped onto the top face -->
+          <g transform="matrix(82.27,-47.5,82.27,47.5,717.73,157.5)">
+            <svg x="0.14" y="0.14" width="0.72" height="0.72" viewBox="0 0 240 240" preserveAspectRatio="xMidYMid meet">
+              <rect x="0" y="0" width="240" height="240" rx="18" fill="#FBF7EC"/>
+              <path d="M85.989,134.4l-50,0l0,-16l17.8,0l0,-26.5l-17.8,1.2l0,-16l23,-5.2l15.8,0l0,46.5l11.2,0l0,16Zm11.7,-6.8c-1.867,-2.933 -3.167,-6.3 -3.9,-10.1c-0.733,-3.8 -1.1,-8.583 -1.1,-14.35c0,-5.767 0.367,-10.55 1.1,-14.35c0.733,-3.8 2.05,-7.15 3.95,-10.05c1.9,-2.9 4.633,-5.017 8.2,-6.35c3.567,-1.333 8.083,-2 13.55,-2c5.467,0 9.967,0.667 13.5,2c3.533,1.333 6.267,3.45 8.2,6.35c1.933,2.9 3.25,6.25 3.95,10.05c0.7,3.8 1.05,8.6 1.05,14.4c0,5.8 -0.35,10.583 -1.05,14.35c-0.7,3.767 -2.017,7.1 -3.95,10c-1.933,2.9 -4.667,5.017 -8.2,6.35c-3.533,1.333 -8.033,2 -13.5,2c-5.467,0 -9.983,-0.667 -13.55,-2c-3.567,-1.333 -6.317,-3.433 -8.25,-6.3Zm15.6,-35.8l0,28l4.2,0c3,0 5.1,-0.317 6.3,-0.95c1.2,-0.633 1.8,-2.083 1.8,-4.35l0,-28l-4.7,0c-2.933,0 -4.933,0.3 -6,0.9c-1.067,0.6 -1.6,2.067 -1.6,4.4Zm44.4,35.8c-1.867,-2.933 -3.167,-6.3 -3.9,-10.1c-0.733,-3.8 -1.1,-8.583 -1.1,-14.35c0,-5.767 0.367,-10.55 1.1,-14.35c0.733,-3.8 2.05,-7.15 3.95,-10.05c1.9,-2.9 4.633,-5.017 8.2,-6.35c3.567,-1.333 8.083,-2 13.55,-2c5.467,0 9.967,0.667 13.5,2c3.533,1.333 6.267,3.45 8.2,6.35c1.933,2.9 3.25,6.25 3.95,10.05c0.7,3.8 1.05,8.6 1.05,14.4c0,5.8 -0.35,10.583 -1.05,14.35c-0.7,3.767 -2.017,7.1 -3.95,10c-1.933,2.9 -4.667,5.017 -8.2,6.35c-3.533,1.333 -8.033,2 -13.5,2c-5.467,0 -9.983,-0.667 -13.55,-2c-3.567,-1.333 -6.317,-3.433 -8.25,-6.3Zm15.6,-35.8l0,28l4.2,0c3,0 5.1,-0.317 6.3,-0.95c1.2,-0.633 1.8,-2.083 1.8,-4.35l0,-28l-4.7,0c-2.933,0 -4.933,0.3 -6,0.9c-1.067,0.6 -1.6,2.067 -1.6,4.4Z" style="fill:#094832;"/>
+              <g>
+                <path d="M23.393,174.668l-1.169,-21.693l194.383,-10.476l1.169,21.693l-194.383,10.476Z" style="fill:#ffd300;"/>
+                <path d="M131.046,152.145l21.724,0l0,102.255l-21.724,0l0,-102.255Z" style="fill:#ffd300;"/>
+                <path d="M87.597,154.713l21.724,0l0,99.687l-21.724,0l0,-99.687Z" style="fill:#ffd300;"/>
+              </g>
+            </svg>
+          </g>
+        </g>
+
+        <!-- abstract network nodes -->
+        <g class="nodes">
+          <g>
+            <circle class="node-glow" cx="900" cy="60" r="20" fill="#FFB199" opacity="0.55" filter="url(#blurSm)"/>
+            <circle cx="900" cy="60" r="9" fill="#FFB199"/>
+          </g>
+          <g>
+            <circle class="node-glow" cx="1000" cy="70" r="24" fill="#FF8C74" opacity="0.55" filter="url(#blurSm)"/>
+            <circle cx="1000" cy="70" r="13" fill="#FF8C74"/>
+          </g>
+          <g>
+            <circle class="node-glow" cx="1100" cy="150" r="27" fill="#5FB8E8" opacity="0.55" filter="url(#blurSm)"/>
+            <circle cx="1100" cy="150" r="15" fill="#5FB8E8"/>
+          </g>
+          <g>
+            <circle class="node-glow" cx="1080" cy="290" r="22" fill="#35C79A" opacity="0.55" filter="url(#blurSm)"/>
+            <circle cx="1080" cy="290" r="12" fill="#35C79A"/>
+          </g>
+          <g>
+            <circle class="node-glow" cx="960" cy="340" r="20" fill="#A98BFF" opacity="0.55" filter="url(#blurSm)"/>
+            <circle cx="960" cy="340" r="11" fill="#A98BFF"/>
+          </g>
+          <g>
+            <circle class="node-glow" cx="630" cy="80" r="22" fill="#FFD300" opacity="0.55" filter="url(#blurSm)"/>
+            <circle cx="630" cy="80" r="12" fill="#FFD300"/>
+          </g>
+          <g>
+            <circle class="node-glow" cx="560" cy="190" r="24" fill="#FF6FB0" opacity="0.55" filter="url(#blurSm)"/>
+            <circle cx="560" cy="190" r="13" fill="#FF6FB0"/>
+          </g>
+          <g>
+            <circle class="node-glow" cx="610" cy="320" r="18" fill="#8FD3F4" opacity="0.55" filter="url(#blurSm)"/>
+            <circle cx="610" cy="320" r="10" fill="#8FD3F4"/>
+          </g>
+        </g>
+      </svg>
+
+      <div class="content">
+        <span class="eyebrow">Open Source · PWA</span>
+        <h1 class="title">lets-talie</h1>
+        <p class="tagline">Split group expenses with friends and family — automatic balances, no spreadsheets, no awkward math.</p>
+        <div class="chips">
+          <span class="chip">Astro</span>
+          <span class="chip">Vue</span>
+          <span class="chip">Offline-ready</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

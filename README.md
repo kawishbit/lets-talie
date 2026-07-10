@@ -1,3 +1,5 @@
+![lets-talie](logo/banner.png)
+
 # lets-talie
 
 A self-hostable PWA for tracking shared expenses between friends and family. Create a group, log who paid for what, and lets-talie works out who owes whom — automatically.
