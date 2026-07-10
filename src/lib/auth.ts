@@ -4,6 +4,7 @@ import * as schema from "@db/schema";
 import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins";
 import { demoLogin } from "./demo-auth";
+import { renderPasswordlessEmail } from "./emails";
 import { sendMail } from "./mailer";
 import { passwordlessBundle } from "./passwordless";
 
@@ -41,11 +42,12 @@ export const auth = betterAuth({
 				await sendMail({
 					to,
 					subject: `Sign in to ${appName}`,
-					html: `
-						<p>Your login code is: <strong style="font-size:24px;letter-spacing:4px">${otp}</strong></p>
-						<p>Or <a href="${magicLinkUrl}">click here</a> to sign in directly.</p>
-						<p>Expires in ${Math.round(expiresInSeconds / 60)} minutes.</p>
-					`,
+					html: renderPasswordlessEmail({
+						otp,
+						magicLinkUrl,
+						expiresInSeconds,
+						appName,
+					}),
 				});
 			},
 		}),

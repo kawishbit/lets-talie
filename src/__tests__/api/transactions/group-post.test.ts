@@ -181,7 +181,9 @@ describe("POST /api/transactions/group", () => {
 		} as never);
 
 		const groupIds = tx.insert.mock.results.map((r) => {
-			const insertChain = r.value as { values: { mock: { calls: unknown[][] } } };
+			const insertChain = r.value as {
+				values: { mock: { calls: unknown[][] } };
+			};
 			return (
 				insertChain.values.mock.calls[0][0] as { transactionGroupId: string }
 			).transactionGroupId;
