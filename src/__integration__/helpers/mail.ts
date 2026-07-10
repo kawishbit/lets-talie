@@ -1,7 +1,9 @@
 /**
  * Reads back real emails the app sends during auth-flow tests via Mailpit's
- * HTTP API (see docker-compose.yml `mailpit-test` service), instead of
- * mocking `sendMail`. This exercises the actual SMTP path end-to-end.
+ * HTTP API, instead of mocking `sendMail`. This exercises the actual SMTP
+ * path end-to-end. `MAILPIT_TEST_HTTP_PORT` is the testcontainers-mapped
+ * port, set on `process.env` before this module loads — see
+ * `../env-bridge.ts` (Vitest) / `./globalSetup.ts` (Playwright).
  */
 const MAILPIT_URL = `http://localhost:${process.env.MAILPIT_TEST_HTTP_PORT ?? "8026"}`;
 
