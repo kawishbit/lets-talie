@@ -32,9 +32,14 @@ export async function recalculateBalances(userIds: string[]): Promise<void> {
 				),
 			);
 
+		// Postgres returns "0" (not "0.00") from COALESCE's fallback when SUM
+		// aggregates zero rows — normalize to the same x.xx format every other
+		// balance value uses, rather than trusting the raw driver string.
+		const balance = Number(result?.balance ?? 0).toFixed(2);
+
 		await db
 			.update(user)
-			.set({ accountBalance: result?.balance ?? "0.00" })
+			.set({ accountBalance: balance })
 			.where(eq(user.id, userId));
 	}
 }

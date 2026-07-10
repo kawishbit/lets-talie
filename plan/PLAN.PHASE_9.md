@@ -7,7 +7,7 @@ Two modes of integration test:
 - **API integration** — `fetch` against a running server with a dedicated test DB. Seed data directly via Drizzle before each test group. Tests cover auth, business logic, and HTTP contract together.
 - **E2E (Playwright)** — real browser, real server, real DB. Tests cover page rendering, navigation guards, and critical user flows.
 
-> **Status: done.** 95 passing + 1 `.todo` API integration tests (`bun run test:integration`) across 10 files, and 31 passing E2E tests (`bun run test:e2e`) across 4 files. Both run against a dedicated `letstalie_test` Postgres database and a Mailpit SMTP catcher, started via `docker compose --profile test up -d db-test mailpit-test`. Several scope adjustments from the original plan text are called out inline below — deliberate, not oversights — plus two real bugs the tests surfaced (documented, not fixed, since this is a test-only phase).
+> **Status: done.** 96 passing API integration tests (`bun run test:integration`) across 10 files, and 31 passing E2E tests (`bun run test:e2e`) across 4 files. Both run against a dedicated `letstalie_test` Postgres database and a Mailpit SMTP catcher, started via `docker compose --profile test up -d db-test mailpit-test`. Several scope adjustments from the original plan text are called out inline below — deliberate, not oversights. Two real bugs the tests surfaced were fixed directly (see 9b and 9e/9f below), since they were small, well-scoped, and confirmed by the new tests themselves.
 
 ## 9a — Integration Test Infrastructure Setup
 
@@ -40,7 +40,7 @@ Two modes of integration test:
 - [x] `recalculateBalances` — ignores soft-deleted and non-completed transactions in the real DB
 - [x] `fetchUsersAndCategories` — returns only non-deleted records from the real DB, ordered correctly
 
-**Bug found here, not fixed:** `recalculateBalances` returns `"0"` (not `"0.00"`) when a user has zero matching completed transactions against the real DB — reproduced directly against the identical SQL. Phase 8's mocked unit test asserting `"0.00"` never catches this, since it stubs the DB response directly rather than running the query. Cosmetic (numerically equivalent) but inconsistent with every other balance value's `x.xx` formatting; see the test note in `transactions-group.test.ts`.
+**Bug found here, fixed:** `recalculateBalances` was returning `"0"` (not `"0.00"`) when a user has zero matching completed transactions against the real DB — reproduced directly against the identical SQL (Postgres's `COALESCE` fallback loses its `.00` scale once passed through the driver in a `.select()` context). Phase 8's mocked unit test asserting `"0.00"` never caught this, since it stubs the DB response directly rather than running the query. `src/lib/balance.ts` now normalizes the result through `Number(...).toFixed(2)` before storing, guaranteeing `x.xx` formatting regardless of what the driver hands back.
 
 ## 9c — Auth Flow Integration
 
@@ -78,7 +78,9 @@ Tests against the live Better Auth endpoints (`/api/auth/...`).
 - [x] `?dateFrom=<iso>&dateTo=<iso>` — filters by date range (inclusive)
 - [x] `?sortBy=date&sortDir=asc` — returns transactions in ascending date order
 - [x] `?page=2&pageSize=5` — returns the correct page slice and total count
-- [ ] ~~Soft-deleted transactions are excluded from results~~ — **bug found, not fixed**: `src/pages/api/transactions/index.ts` builds its `where` conditions with no `isNull(deletedAt)` filter at all, unlike every sibling list endpoint (`/api/categories`, `/api/users`, `/api/transactions/groups/pending`), so a regular user's own soft-deleted transaction still appears. (The initial server-rendered `/transactions` page does filter it correctly; only the client-side-pagination API path is affected.) Left as `it.todo(...)` in `transactions-get.test.ts` rather than asserting the buggy behavior as correct.
+- [x] Soft-deleted transactions are excluded from results (for regular users)
+
+**Bug found here, fixed:** `src/pages/api/transactions/index.ts` built its `where` conditions with no `isNull(deletedAt)` filter at all, unlike every sibling list endpoint (`/api/categories`, `/api/users`, `/api/transactions/groups/pending`), so a regular user's own soft-deleted transaction (e.g. from a deleted group) still appeared via the client-side-pagination path — the initial server-rendered `/transactions` page filtered it correctly, only the API didn't. Fixed by adding `isNull(transactions.deletedAt)` to the `!isAdmin` branch only: admins still see soft-deleted rows (greyed out), matching the styling `TransactionTable.vue` already has for it.
 - [x] Response shape is `{ items, total, page, pageSize }`
 
 ## 9f — API Integration: Group Transactions (full lifecycle)
@@ -102,10 +104,10 @@ Tests against the live Better Auth endpoints (`/api/auth/...`).
 
 **Delete (`DELETE /api/transactions/group/[groupId]`)**
 - [x] Soft-deletes all transactions in the group (sets `deletedAt`)
-- [x] Deleting a completed group recalculates and reverses user balances (see the `"0"` vs `"0.00"` note under 9b — this is where it's exercised)
+- [x] Deleting a completed group recalculates and reverses user balances (this is where the 9b `"0.00"` formatting fix is exercised — the payer's balance goes fully back to zero)
 - [x] Deleting a pending group does not change user balances
 - [x] Attempting to delete a non-existent (or already deleted) groupId returns `404`
-- [ ] ~~Deleted transactions do not appear in the `GET /api/transactions` listing~~ — same bug as 9e; not asserted here either.
+- [x] Deleted transactions do not appear in the `GET /api/transactions` listing (for the regular-user party involved — same fix as 9e)
 
 ## 9g — API Integration: Single Transactions (full lifecycle)
 

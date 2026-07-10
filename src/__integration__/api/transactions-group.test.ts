@@ -282,21 +282,19 @@ describe("DELETE /api/transactions/group/[groupId]", () => {
 			.where(eq(transactions.transactionGroupId, groupId));
 		expect(rows.every((r) => r.deletedAt !== null)).toBe(true);
 
-		// Real Postgres, not "0.00": when recalculateBalances' SUM aggregates
-		// zero matching rows (all now soft-deleted), COALESCE's fallback
-		// comes back as "0" rather than the "0.00" the literal in balance.ts
-		// suggests — a formatting quirk the Phase 8 mocked unit test can't
-		// see (it stubs the DB response directly). Confirmed by reproducing
-		// the identical query standalone; not fixed here. See PLAN.PHASE_9.md.
 		const [payerRow] = await db
 			.select()
 			.from(user)
 			.where(eq(user.id, payer.id));
-		expect(payerRow?.accountBalance).toBe("0");
+		expect(payerRow?.accountBalance).toBe("0.00");
 
-		// Not asserting the listing excludes these rows — see the
-		// GET /api/transactions soft-delete-filter bug noted in
-		// transactions-get.test.ts; this same DELETE fully exercises that gap.
+		// The payer (a regular user) should never see their own deleted rows.
+		const payerCookie = await sessionCookieFor(payer.id);
+		const listRes = await apiFetch("/api/transactions", {
+			cookie: payerCookie,
+		});
+		const listBody = (await listRes.json()) as { items: unknown[] };
+		expect(listBody.items).toEqual([]);
 	});
 
 	it("deleting a pending group does not change balances", async () => {

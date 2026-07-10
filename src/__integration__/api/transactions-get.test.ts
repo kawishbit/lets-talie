@@ -163,14 +163,23 @@ describe("GET /api/transactions", () => {
 		expect(body.pageSize).toBe(1);
 	});
 
-	// BUG (found here, not fixed as part of this test-only phase): unlike
-	// GET /api/categories, GET /api/users, and GET /api/transactions/groups/pending
-	// — which all filter isNull(deletedAt) — src/pages/api/transactions/index.ts
-	// builds its `conditions` array with no deletedAt filter at all, so
-	// soft-deleted rows (e.g. from a deleted group) still show up in the
-	// transaction history listing. Left as `.todo` rather than asserting the
-	// buggy behavior as correct; see PLAN.PHASE_9.md for the follow-up.
-	it.todo("excludes soft-deleted transactions");
+	// Regular users never see their own soft-deleted rows (e.g. from a
+	// deleted group). Admins still do, greyed out in the UI — TransactionTable.vue
+	// has explicit styling for it — so the filter only applies to non-admins.
+	it("excludes a regular user's own soft-deleted transactions", async () => {
+		const user = await seedUser();
+		await seedTransaction({ paidByUserId: user.id, name: "Visible" });
+		await seedTransaction({
+			paidByUserId: user.id,
+			name: "Deleted",
+			deletedAt: new Date(),
+		});
+		const cookie = await sessionCookieFor(user.id);
+
+		const res = await apiFetch("/api/transactions", { cookie });
+		const body = (await res.json()) as { items: { name: string }[] };
+		expect(body.items.map((t) => t.name)).toEqual(["Visible"]);
+	});
 
 	it("response shape is { items, total, page, pageSize }", async () => {
 		const user = await seedUser();

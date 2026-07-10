@@ -1,7 +1,7 @@
 import { db } from "@db/database";
 import { transactionCategories, transactions, user } from "@db/schema";
 import type { APIRoute } from "astro";
-import { and, asc, between, desc, eq, sql } from "drizzle-orm";
+import { and, asc, between, desc, eq, isNull, sql } from "drizzle-orm";
 
 const DEFAULT_PAGE_SIZE = 25;
 
@@ -38,9 +38,11 @@ export const GET: APIRoute = async ({ locals, url }) => {
 	// Build where conditions
 	const conditions = [];
 
-	// Admins see all; regular users see only their own
+	// Admins see all (including soft-deleted, shown greyed out in the UI);
+	// regular users see only their own, and never their deleted rows.
 	if (!isAdmin) {
 		conditions.push(eq(transactions.paidByUserId, sessionUser.id));
+		conditions.push(isNull(transactions.deletedAt));
 	}
 
 	if (filterStatus) {
