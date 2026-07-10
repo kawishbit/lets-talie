@@ -1,5 +1,7 @@
 import { defineMiddleware } from "astro:middleware";
 import { auth } from "@lib/auth";
+import { describeDbError } from "@lib/db-errors";
+import { checkDbHealth } from "@lib/db-health";
 
 const PUBLIC_ROUTES = new Set(["/", "/login"]);
 const AUTH_API_PREFIX = "/api/auth";
@@ -29,9 +31,29 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		);
 	}
 
-	const session = await auth.api.getSession({
-		headers: context.request.headers,
-	});
+	// Check the database is reachable and migrated *before* calling into
+	// Better Auth — it swallows driver errors internally (logging a bare
+	// "Failed to get session") instead of throwing, so we can't rely on
+	// catching them here.
+	const dbError = await checkDbHealth();
+	if (dbError) {
+		console.error(`[startup-check] ${dbError}`);
+		return new Response(dbError, { status: 503 });
+	}
+
+	let session: Awaited<ReturnType<typeof auth.api.getSession>>;
+	try {
+		session = await auth.api.getSession({
+			headers: context.request.headers,
+		});
+	} catch (err) {
+		const message = describeDbError(err);
+		if (message) {
+			console.error(`[startup-check] ${message}`);
+			return new Response(message, { status: 503 });
+		}
+		throw err;
+	}
 
 	context.locals.user = session?.user
 		? {

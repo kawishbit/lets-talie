@@ -180,11 +180,12 @@ describe("POST /api/transactions/group", () => {
 			request: makeRequest(validBody),
 		} as never);
 
-		const groupIds = tx.insert.mock.results.map(
-			(r: { value: { values: { mock: { calls: unknown[][] } } } }) =>
-				(r.value.values.mock.calls[0][0] as { transactionGroupId: string })
-					.transactionGroupId,
-		);
+		const groupIds = tx.insert.mock.results.map((r) => {
+			const insertChain = r.value as { values: { mock: { calls: unknown[][] } } };
+			return (
+				insertChain.values.mock.calls[0][0] as { transactionGroupId: string }
+			).transactionGroupId;
+		});
 		expect(new Set(groupIds).size).toBe(1);
 	});
 

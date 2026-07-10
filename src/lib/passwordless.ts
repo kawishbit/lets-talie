@@ -7,6 +7,7 @@ import { setSessionCookie } from "better-auth/cookies";
 import { generateRandomString } from "better-auth/crypto";
 import { parseUserInput, parseUserOutput } from "better-auth/db";
 import * as z from "zod";
+import { describeMailError } from "./mail-errors";
 
 type SendEmailPayload = {
 	to: string;
@@ -264,17 +265,23 @@ const passwordlessBundle = (options: PasswordlessBundleOptions) => {
 					}
 
 					const appName = ctx.context.options.appName ?? "Better Auth";
-					await options.sendEmail(
-						{
-							to: email,
-							otp,
-							magicLinkUrl: verifyUrl.toString(),
-							expiresInSeconds,
-							appName,
-							requestMetadata: ctx.body.metadata,
-						},
-						ctx,
-					);
+					try {
+						await options.sendEmail(
+							{
+								to: email,
+								otp,
+								magicLinkUrl: verifyUrl.toString(),
+								expiresInSeconds,
+								appName,
+								requestMetadata: ctx.body.metadata,
+							},
+							ctx,
+						);
+					} catch (err) {
+						const message = describeMailError(err);
+						console.error(`[startup-check] ${message}`);
+						throw APIError.fromStatus("SERVICE_UNAVAILABLE", { message });
+					}
 
 					// avoid user enumeration
 					return ctx.json({ success: true });
