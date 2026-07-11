@@ -16,6 +16,12 @@ export const auth = betterAuth({
 		provider: "pg",
 		schema,
 	}),
+	// Emit UUIDs for id columns so they match the native `uuid` type in the schema.
+	advanced: {
+		database: {
+			generateId: "uuid",
+		},
+	},
 	user: {
 		additionalFields: {
 			accountBalance: {

@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { db } from "@db/database";
 import { transactionCategories, transactions, user } from "@db/schema";
 import { recalculateBalances } from "@lib/balance";
@@ -5,6 +6,19 @@ import { recalculateBalances } from "@lib/balance";
 // Every row below uses a fixed, deterministic id and is inserted with
 // onConflictDoNothing, so re-running this script (e.g. after a redeploy)
 // never duplicates data — it's a no-op once the demo data already exists.
+//
+// The id columns are native `uuid`, so the readable slugs below (e.g.
+// "demo-user-you") can't be stored directly. `seedUuid` maps each slug to a
+// stable UUIDv5-style value via SHA-1, keeping the data legible while staying
+// deterministic: the same slug always yields the same uuid, so re-runs remain
+// idempotent and cross-references (paidBy, parties, categoryId) line up.
+function seedUuid(slug: string): string {
+	const bytes = createHash("sha1").update(slug).digest().subarray(0, 16);
+	bytes[6] = (bytes[6] & 0x0f) | 0x50; // version 5
+	bytes[8] = (bytes[8] & 0x3f) | 0x80; // RFC 4122 variant
+	const hex = bytes.toString("hex");
+	return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
+}
 
 const DEMO_USER_EMAIL = process.env.DEMO_USER_EMAIL;
 if (!DEMO_USER_EMAIL) {
@@ -24,31 +38,31 @@ const USERS = [
 	{
 		id: "demo-user-alex",
 		name: "Alex Chen",
-		email: "alex@demo.lets-talie.app",
+		email: "alex@lets-talie-demo.kawishbit.com",
 		role: "user",
 	},
 	{
 		id: "demo-user-sam",
 		name: "Sam Rivera",
-		email: "sam@demo.lets-talie.app",
+		email: "sam@lets-talie-demo.kawishbit.com",
 		role: "user",
 	},
 	{
 		id: "demo-user-jordan",
 		name: "Jordan Lee",
-		email: "jordan@demo.lets-talie.app",
+		email: "jordan@lets-talie-demo.kawishbit.com",
 		role: "user",
 	},
 	{
 		id: "demo-user-taylor",
 		name: "Taylor Kim",
-		email: "taylor@demo.lets-talie.app",
+		email: "taylor@lets-talie-demo.kawishbit.com",
 		role: "user",
 	},
 	{
 		id: "demo-user-morgan",
 		name: "Morgan Patel",
-		email: "morgan@demo.lets-talie.app",
+		email: "morgan@lets-talie-demo.kawishbit.com",
 		role: "user",
 	},
 ] as const;
@@ -177,7 +191,7 @@ async function seedDemo() {
 		.insert(user)
 		.values(
 			USERS.map((u) => ({
-				id: u.id,
+				id: seedUuid(u.id),
 				name: u.name,
 				email: u.email,
 				emailVerified: true,
@@ -194,7 +208,7 @@ async function seedDemo() {
 		.insert(transactionCategories)
 		.values(
 			CATEGORIES.map((c) => ({
-				id: c.id,
+				id: seedUuid(c.id),
 				label: c.label,
 				remarks: c.remarks,
 				createdAt: now,
@@ -207,13 +221,13 @@ async function seedDemo() {
 		const perPerson = (group.amount / group.parties.length).toFixed(2);
 		const date = daysAgo(group.daysAgo);
 		const commonFields = {
-			transactionGroupId: group.id,
+			transactionGroupId: seedUuid(group.id),
 			name: group.name,
 			date,
 			remarks: null,
-			categoryId: group.categoryId,
+			categoryId: seedUuid(group.categoryId),
 			status: group.status,
-			createdByUserId: group.paidBy,
+			createdByUserId: seedUuid(group.paidBy),
 			createdAt: now,
 			updatedAt: now,
 		};
@@ -221,11 +235,11 @@ async function seedDemo() {
 		await db
 			.insert(transactions)
 			.values({
-				id: `${group.id}-deposit`,
+				id: seedUuid(`${group.id}-deposit`),
 				...commonFields,
 				amount: group.amount.toFixed(2),
 				type: "deposit",
-				paidByUserId: group.paidBy,
+				paidByUserId: seedUuid(group.paidBy),
 			})
 			.onConflictDoNothing();
 
@@ -233,11 +247,11 @@ async function seedDemo() {
 			await db
 				.insert(transactions)
 				.values({
-					id: `${group.id}-w-${partyId}`,
+					id: seedUuid(`${group.id}-w-${partyId}`),
 					...commonFields,
 					amount: perPerson,
 					type: "withdrawal",
-					paidByUserId: partyId,
+					paidByUserId: seedUuid(partyId),
 				})
 				.onConflictDoNothing();
 		}
@@ -247,7 +261,7 @@ async function seedDemo() {
 		await db
 			.insert(transactions)
 			.values({
-				id: single.id,
+				id: seedUuid(single.id),
 				transactionGroupId: null,
 				name: single.name,
 				date: daysAgo(single.daysAgo),
@@ -255,16 +269,16 @@ async function seedDemo() {
 				amount: single.amount.toFixed(2),
 				type: single.type,
 				status: single.status,
-				paidByUserId: single.paidBy,
-				categoryId: single.categoryId,
-				createdByUserId: single.paidBy,
+				paidByUserId: seedUuid(single.paidBy),
+				categoryId: single.categoryId ? seedUuid(single.categoryId) : null,
+				createdByUserId: seedUuid(single.paidBy),
 				createdAt: now,
 				updatedAt: now,
 			})
 			.onConflictDoNothing();
 	}
 
-	await recalculateBalances(USERS.map((u) => u.id));
+	await recalculateBalances(USERS.map((u) => seedUuid(u.id)));
 
 	console.log(
 		`Demo data seeded. Sign in as ${DEMO_USER_EMAIL} via "Continue as Demo".`,

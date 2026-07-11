@@ -6,12 +6,13 @@ import {
 	pgTable,
 	text,
 	timestamp,
+	uuid,
 } from "drizzle-orm/pg-core";
 
 // ─── Better Auth core tables ───────────────────────────────────────────────
 
 export const user = pgTable("user", {
-	id: text("id").primaryKey(),
+	id: uuid("id").primaryKey(),
 	name: text("name").notNull(),
 	email: text("email").notNull().unique(),
 	emailVerified: boolean("email_verified").default(false).notNull(),
@@ -31,7 +32,7 @@ export const user = pgTable("user", {
 export const session = pgTable(
 	"session",
 	{
-		id: text("id").primaryKey(),
+		id: uuid("id").primaryKey(),
 		expiresAt: timestamp("expires_at").notNull(),
 		token: text("token").notNull().unique(),
 		createdAt: timestamp("created_at").notNull(),
@@ -40,8 +41,8 @@ export const session = pgTable(
 			.notNull(),
 		ipAddress: text("ip_address"),
 		userAgent: text("user_agent"),
-		impersonatedBy: text("impersonated_by"),
-		userId: text("user_id")
+		impersonatedBy: uuid("impersonated_by"),
+		userId: uuid("user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
 	},
@@ -51,10 +52,10 @@ export const session = pgTable(
 export const account = pgTable(
 	"account",
 	{
-		id: text("id").primaryKey(),
+		id: uuid("id").primaryKey(),
 		accountId: text("account_id").notNull(),
 		providerId: text("provider_id").notNull(),
-		userId: text("user_id")
+		userId: uuid("user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
 		accessToken: text("access_token"),
@@ -75,7 +76,7 @@ export const account = pgTable(
 export const verification = pgTable(
 	"verification",
 	{
-		id: text("id").primaryKey(),
+		id: uuid("id").primaryKey(),
 		identifier: text("identifier").notNull(),
 		value: text("value").notNull(),
 		expiresAt: timestamp("expires_at").notNull(),
@@ -112,7 +113,7 @@ export const authRelations = defineRelations(
 // ─── App tables ────────────────────────────────────────────────────────────
 
 export const transactionCategories = pgTable("transaction_categories", {
-	id: text("id").primaryKey(),
+	id: uuid("id").primaryKey(),
 	label: text("label").notNull(),
 	remarks: text("remarks"),
 	createdAt: timestamp("created_at").notNull(),
@@ -121,25 +122,25 @@ export const transactionCategories = pgTable("transaction_categories", {
 });
 
 export const transactions = pgTable("transactions", {
-	id: text("id").primaryKey(),
-	transactionGroupId: text("transaction_group_id"),
+	id: uuid("id").primaryKey(),
+	transactionGroupId: uuid("transaction_group_id"),
 	name: text("name").notNull(),
 	date: timestamp("date").notNull(),
 	remarks: text("remarks"),
 	amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
 	type: text("type").notNull(), // 'deposit' | 'withdrawal'
 	status: text("status").notNull().default("pending"), // 'pending' | 'completed' | 'cancelled'
-	createdByUserId: text("created_by_user_id")
+	createdByUserId: uuid("created_by_user_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
-	lastUpdatedByUserId: text("last_updated_by_user_id").references(
+	lastUpdatedByUserId: uuid("last_updated_by_user_id").references(
 		() => user.id,
 		{ onDelete: "cascade" },
 	),
-	paidByUserId: text("paid_by_user_id")
+	paidByUserId: uuid("paid_by_user_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
-	categoryId: text("category_id").references(() => transactionCategories.id, {
+	categoryId: uuid("category_id").references(() => transactionCategories.id, {
 		onDelete: "set null",
 	}),
 	createdAt: timestamp("created_at").notNull(),
