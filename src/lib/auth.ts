@@ -17,9 +17,14 @@ export const auth = betterAuth({
 		schema,
 	}),
 	// Emit UUIDs for id columns so they match the native `uuid` type in the schema.
+	// NB: must be a function, not the "uuid" string. With the Drizzle adapter
+	// (supportsUUIDs = true), `generateId: "uuid"` makes Better Auth omit the id
+	// and expect the DB to default it — but our uuid PKs have no default, so
+	// inserts fail with a NOT NULL violation. A function forces Better Auth to
+	// generate the id in code, matching how the app tables create ids.
 	advanced: {
 		database: {
-			generateId: "uuid",
+			generateId: () => crypto.randomUUID(),
 		},
 	},
 	user: {
