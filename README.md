@@ -6,7 +6,7 @@ A self-hostable PWA for tracking shared expenses between friends and family. Cre
 
 A negative balance means you owe the group; a positive balance means the group owes you.
 
-**Live demo:** _link once deployed_
+**Live demo:** [Demo](https://lets-talie-demo.kawishbit.com) 
 
 ## Tech stack
 
