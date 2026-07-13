@@ -1,6 +1,9 @@
 <script setup lang="ts">
 	import { formatDate } from "@utils/date.ts";
 	import { ref } from "vue";
+	import IconPencil from "~icons/lucide/pencil";
+	import IconPlus from "~icons/lucide/plus";
+	import IconTrash2 from "~icons/lucide/trash-2";
 	import { useServerTable } from "../composables/useServerTable";
 	import DataTable from "./DataTable.vue";
 	import UserFormModal from "./UserFormModal.vue";
@@ -129,20 +132,7 @@
 					@click="openCreate"
 					class="inline-flex items-center gap-1.5 bg-ink text-(--color-canvas) px-4 py-2 rounded-full text-sm font-[480] tracking-[-0.01em] hover:opacity-80 transition-opacity cursor-pointer"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="w-4 h-4"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						aria-hidden="true"
-					>
-						<line x1="12" y1="5" x2="12" y2="19" />
-						<line x1="5" y1="12" x2="19" y2="12" />
-					</svg>
+					<IconPlus class="w-4 h-4" aria-hidden="true" />
 					Add user
 				</button>
 			</div>
@@ -150,27 +140,27 @@
 
 		<template #head>
 			<th
-				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider"
+				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider whitespace-nowrap"
 			>
 				Name
 			</th>
 			<th
-				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider hidden sm:table-cell"
+				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider whitespace-nowrap"
 			>
 				Email
 			</th>
 			<th
-				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider"
+				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider whitespace-nowrap"
 			>
 				Role
 			</th>
 			<th
-				class="text-right px-4 py-3 font-medium text-label text-xs uppercase tracking-wider hidden md:table-cell"
+				class="text-right px-4 py-3 font-medium text-label text-xs uppercase tracking-wider whitespace-nowrap"
 			>
 				Balance
 			</th>
 			<th
-				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider hidden lg:table-cell"
+				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider whitespace-nowrap"
 			>
 				Joined
 			</th>
@@ -183,8 +173,8 @@
 				:key="u.id"
 				class="border-b border-hairline last:border-0 hover:bg-faint transition-colors"
 			>
-				<td class="px-4 py-3 font-[450]">{{ u.name }}</td>
-				<td class="px-4 py-3 text-label hidden sm:table-cell">
+				<td class="px-4 py-3 font-[450] whitespace-nowrap">{{ u.name }}</td>
+				<td class="px-4 py-3 text-label whitespace-nowrap">
 					{{ u.email }}
 				</td>
 				<td class="px-4 py-3">
@@ -198,14 +188,14 @@
 						>{{ u.role }}</span
 					>
 				</td>
-				<td class="px-4 py-3 text-right hidden md:table-cell">
+				<td class="px-4 py-3 text-right whitespace-nowrap">
 					<span
 						:class="parseFloat(u.accountBalance ?? '0') >= 0 ? 'text-green-700' : 'text-red-600'"
 					>
 						{{ formatBalance(u.accountBalance) }}
 					</span>
 				</td>
-				<td class="px-4 py-3 text-muted hidden lg:table-cell">
+				<td class="px-4 py-3 text-muted whitespace-nowrap">
 					{{ formatDate(u.createdAt) }}
 				</td>
 				<td class="px-4 py-3">
@@ -216,24 +206,7 @@
 							class="p-1.5 rounded-full hover:bg-surface transition-colors text-label hover:text-ink cursor-pointer"
 							title="Edit"
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="w-4 h-4"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								aria-hidden="true"
-							>
-								<path
-									d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-								/>
-								<path
-									d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
-								/>
-							</svg>
+							<IconPencil class="w-4 h-4" aria-hidden="true" />
 						</button>
 						<button
 							v-if="u.id !== currentUserId"
@@ -242,23 +215,7 @@
 							class="p-1.5 rounded-full hover:bg-error-bg transition-colors text-muted hover:text-red-600 cursor-pointer"
 							title="Delete"
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="w-4 h-4"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								aria-hidden="true"
-							>
-								<polyline points="3 6 5 6 21 6" />
-								<path d="M19 6l-1 14H6L5 6" />
-								<path d="M10 11v6" />
-								<path d="M14 11v6" />
-								<path d="M9 6V4h6v2" />
-							</svg>
+							<IconTrash2 class="w-4 h-4" aria-hidden="true" />
 						</button>
 					</div>
 				</td>

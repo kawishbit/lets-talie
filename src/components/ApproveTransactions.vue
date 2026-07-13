@@ -1,6 +1,8 @@
 <script setup lang="ts">
 	import { formatDate } from "@utils/date.ts";
 	import { ref } from "vue";
+	import IconCheck from "~icons/lucide/check";
+	import IconX from "~icons/lucide/x";
 	import { useServerTable } from "../composables/useServerTable";
 
 	interface PendingGroup {
@@ -182,19 +184,7 @@
 					@click="handleAction(group.groupId, 'approve')"
 					class="inline-flex items-center gap-1.5 bg-ink text-(--color-canvas) px-4 py-2 rounded-full text-sm font-[480] tracking-[-0.01em] hover:opacity-80 transition-opacity cursor-pointer"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="w-4 h-4"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						aria-hidden="true"
-					>
-						<polyline points="20 6 9 17 4 12" />
-					</svg>
+					<IconCheck class="w-4 h-4" aria-hidden="true" />
 					Approve
 				</button>
 				<button
@@ -202,20 +192,7 @@
 					@click="handleAction(group.groupId, 'reject')"
 					class="inline-flex items-center gap-1.5 border border-hairline text-muted px-4 py-2 rounded-full text-sm font-[480] tracking-[-0.01em] hover:border-red-300 hover:text-red-600 transition-colors cursor-pointer"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="w-4 h-4"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						aria-hidden="true"
-					>
-						<line x1="18" y1="6" x2="6" y2="18" />
-						<line x1="6" y1="6" x2="18" y2="18" />
-					</svg>
+					<IconX class="w-4 h-4" aria-hidden="true" />
 					Reject
 				</button>
 			</div>

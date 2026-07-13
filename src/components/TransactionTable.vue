@@ -184,12 +184,12 @@
 
 		<template #head>
 			<th
-				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider"
+				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider whitespace-nowrap"
 			>
 				Name
 			</th>
 			<th
-				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider hidden md:table-cell cursor-pointer select-none"
+				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider whitespace-nowrap cursor-pointer select-none"
 				@click="toggleSort('date')"
 			>
 				Date
@@ -198,27 +198,27 @@
 				>
 			</th>
 			<th
-				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider hidden xl:table-cell"
+				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider whitespace-nowrap"
 			>
 				Created
 			</th>
 			<th
-				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider hidden sm:table-cell"
+				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider whitespace-nowrap"
 			>
 				Status
 			</th>
 			<th
-				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider hidden lg:table-cell"
+				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider whitespace-nowrap"
 			>
 				Category
 			</th>
 			<th
-				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider hidden sm:table-cell"
+				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider whitespace-nowrap"
 			>
 				Type
 			</th>
 			<th
-				class="text-right px-4 py-3 font-medium text-label text-xs uppercase tracking-wider cursor-pointer select-none"
+				class="text-right px-4 py-3 font-medium text-label text-xs uppercase tracking-wider whitespace-nowrap cursor-pointer select-none"
 				@click="toggleSort('amount')"
 			>
 				Amount
@@ -239,7 +239,7 @@
 			>
 				<td class="px-4 py-3">
 					<div class="flex flex-col gap-0.5">
-						<span>{{ row.name }}</span>
+						<span class="whitespace-nowrap">{{ row.name }}</span>
 						<span
 							v-if="row.transactionGroupId"
 							class="font-mono text-[10px] text-muted tracking-wider"
@@ -248,31 +248,31 @@
 						>
 					</div>
 				</td>
-				<td class="px-4 py-3 text-muted hidden md:table-cell">
+				<td class="px-4 py-3 text-muted whitespace-nowrap">
 					{{ formatDate(row.date) }}
 				</td>
-				<td class="px-4 py-3 text-muted hidden xl:table-cell">
+				<td class="px-4 py-3 text-muted whitespace-nowrap">
 					{{ formatDate(row.createdAt) }}
 				</td>
-				<td class="px-4 py-3 hidden sm:table-cell">
+				<td class="px-4 py-3 whitespace-nowrap">
 					<span
 						:class="['inline-block px-2 py-0.5 rounded-full text-xs font-medium', statusBadgeClass(row.status)]"
 					>
 						{{ row.status }}
 					</span>
 				</td>
-				<td class="px-4 py-3 text-muted hidden lg:table-cell">
+				<td class="px-4 py-3 text-muted whitespace-nowrap">
 					<span v-if="row.categoryLabel">{{ row.categoryLabel }}</span>
 					<span v-else class="text-subtle">—</span>
 				</td>
-				<td class="px-4 py-3 hidden sm:table-cell">
+				<td class="px-4 py-3 whitespace-nowrap">
 					<span
 						:class="['inline-block px-2 py-0.5 rounded-full text-xs font-medium', typeBadgeClass(row.type)]"
 					>
 						{{ row.type }}
 					</span>
 				</td>
-				<td class="px-4 py-3 text-right font-medium">
+				<td class="px-4 py-3 text-right font-medium whitespace-nowrap">
 					{{ formatCurrency(row.amount) }}
 				</td>
 			</tr>

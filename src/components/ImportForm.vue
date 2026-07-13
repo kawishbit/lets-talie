@@ -6,6 +6,7 @@
 		resolveReferenceOrError,
 	} from "@lib/resolve-references";
 	import { computed, ref } from "vue";
+	import IconSpinner from "~icons/app/spinner";
 
 	interface ParsedRow {
 		_rowNum: number;
@@ -453,28 +454,11 @@
           : 'bg-hairline text-subtle cursor-not-allowed',
       ]"
 		>
-			<svg
+			<IconSpinner
 				v-if="loading"
 				class="w-4 h-4 animate-spin"
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
 				aria-hidden="true"
-			>
-				<circle
-					class="opacity-25"
-					cx="12"
-					cy="12"
-					r="10"
-					stroke="currentColor"
-					stroke-width="4"
-				/>
-				<path
-					class="opacity-75"
-					fill="currentColor"
-					d="M4 12a8 8 0 018-8v8H4z"
-				/>
-			</svg>
+			/>
 			{{ loading ? 'Importing…' : parsedRows.length > 0 ? `Import ${parsedRows.length} transaction${parsedRows.length === 1 ? '' : 's'}` : 'Import' }}
 		</button>
 	</div>

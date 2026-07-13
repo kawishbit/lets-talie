@@ -160,12 +160,12 @@
 				type="text"
 				placeholder="Dinner at Sakura"
 				required
-				class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-inkn-colors bg-(--color-input-bg)"
+				class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 			>
 		</div>
 
 		<!-- Date + Amount row -->
-		<div class="grid grid-cols-2 gap-3">
+		<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 			<div class="flex flex-col gap-1.5">
 				<label
 					for="gt-date"
@@ -177,13 +177,13 @@
 					v-model="date"
 					type="date"
 					required
-					class="w-full px-3 py-2.5 rounded-xl border border-hairlineutline-none focus:bordfocus:border-inkn-colors bg-(--color-input-bg)"
+					class="w-full min-w-0 px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 				>
 			</div>
 			<div class="flex flex-col gap-1.5">
 				<label
 					for="gt-amount"
-					class="text-xs font-mediumm uppercase tracking-widertext-label)"
+					class="text-xs font-medium uppercase tracking-wider text-label"
 					>Amount</label
 				>
 				<input
@@ -194,7 +194,7 @@
 					step="0.01"
 					placeholder="0.00"
 					required
-					class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
+					class="w-full min-w-0 px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 				>
 			</div>
 		</div>

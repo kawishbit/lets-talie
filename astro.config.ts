@@ -4,6 +4,8 @@ import vue from "@astrojs/vue";
 import tailwindcss from "@tailwindcss/vite";
 import AstroPWA from "@vite-pwa/astro";
 import { defineConfig } from "astro/config";
+import { FileSystemIconLoader } from "unplugin-icons/loaders";
+import Icons from "unplugin-icons/vite";
 
 // ADAPTER=vercel -> serverless build for the public demo (Vercel).
 // Anything else (unset) -> standalone Node server for Docker / bare-metal.
@@ -21,7 +23,15 @@ export default defineConfig({
 		port: 30001,
 	},
 	vite: {
-		plugins: [tailwindcss()],
+		plugins: [
+			tailwindcss(),
+			Icons({
+				compiler: "vue3",
+				customCollections: {
+					app: FileSystemIconLoader("./src/icons"),
+				},
+			}),
+		],
 	},
 	integrations: [
 		AstroPWA({
@@ -37,11 +47,19 @@ export default defineConfig({
 						src: "pwa-192x192.png",
 						sizes: "192x192",
 						type: "image/png",
+						purpose: "any",
 					},
 					{
 						src: "pwa-512x512.png",
 						sizes: "512x512",
 						type: "image/png",
+						purpose: "any",
+					},
+					{
+						src: "pwa-maskable-512x512.png",
+						sizes: "512x512",
+						type: "image/png",
+						purpose: "maskable",
 					},
 				],
 			},

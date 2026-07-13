@@ -115,7 +115,7 @@
 		</div>
 
 		<!-- Date + Amount row -->
-		<div class="grid grid-cols-2 gap-3">
+		<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 			<div class="flex flex-col gap-1.5">
 				<label
 					for="tx-date"
@@ -127,7 +127,7 @@
 					v-model="date"
 					type="date"
 					required
-					class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
+					class="w-full min-w-0 px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 				>
 			</div>
 			<div class="flex flex-col gap-1.5">
@@ -144,7 +144,7 @@
 					step="0.01"
 					placeholder="0.00"
 					required
-					class="w-full px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
+					class="w-full min-w-0 px-3 py-2.5 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
 				>
 			</div>
 		</div>
@@ -170,7 +170,7 @@
 		</div>
 
 		<!-- Type + Status row -->
-		<div class="grid grid-cols-2 gap-3">
+		<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 			<div class="flex flex-col gap-1.5">
 				<label
 					for="tx-type"

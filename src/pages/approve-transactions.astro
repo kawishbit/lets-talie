@@ -90,7 +90,10 @@ if (pendingGroupRows.length > 0) {
 		)
 		.where(
 			and(
-				inArray(transactions.transactionGroupId, groupIds),
+				inArray(
+					transactions.transactionGroupId,
+					groupIds,
+				),
 				isNull(transactions.deletedAt),
 			),
 		)
@@ -139,10 +142,12 @@ if (pendingGroupRows.length > 0) {
 ---
 
 <Layout title="Approve Transactions">
-	<div class="max-w-screen-lg mx-auto px-6 py-10">
+	<div class="max-w-screen-lg mx-auto px-4 xs:px-6 py-10">
 		<!-- Header -->
 		<div class="mb-8">
-			<p class="font-mono text-xs uppercase tracking-widest text-muted mb-2">
+			<p
+				class="font-mono text-xs uppercase tracking-widest text-muted mb-2"
+			>
 				Admin
 			</p>
 			<h1
@@ -151,8 +156,9 @@ if (pendingGroupRows.length > 0) {
 				Approve Transactions
 			</h1>
 			<p class="text-sm text-muted font-[330] mt-2">
-				{total}&nbsp;pending group{total === 1 ? "" : "s"}
-				awaiting review
+				{total}&nbsp;pending group{
+					total === 1 ? "" : "s"
+				}&nbsp; awaiting review
 			</p>
 		</div>
 

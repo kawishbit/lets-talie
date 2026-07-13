@@ -1,4 +1,8 @@
 ---
+import IconMenu from "~icons/lucide/menu";
+import IconMoon from "~icons/lucide/moon";
+import IconSun from "~icons/lucide/sun";
+import IconX from "~icons/lucide/x";
 import { navClass } from "../utils/nav";
 import AdminNavLinks from "./AdminNavLinks.astro";
 import SignOutButton from "./SignOutButton.vue";
@@ -23,7 +27,7 @@ const isDemoUser =
 					You're viewing a read-only demo account. Changes won't be saved.
 				</div>
 			)}
-			<nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
+			<nav class="max-w-7xl mx-auto px-4 xs:px-6 py-4 flex items-center justify-between gap-4">
 				<div class="flex items-center gap-8">
 					<a
 						href="/dashboard"
@@ -69,87 +73,9 @@ const isDemoUser =
 						class="p-1.5 rounded-full border border-hairline hover:bg-surface transition-colors cursor-pointer text-muted"
 					>
 						{/* Moon icon (shown in light mode) */}
-						<svg
-							id="icon-moon"
-							xmlns="http://www.w3.org/2000/svg"
-							class="w-4 h-4"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							aria-hidden="true"
-						>
-							<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-						</svg>
+						<IconMoon id="icon-moon" class="w-4 h-4" aria-hidden="true" />
 						{/* Sun icon (shown in dark mode) */}
-						<svg
-							id="icon-sun"
-							xmlns="http://www.w3.org/2000/svg"
-							class="w-4 h-4 hidden"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							aria-hidden="true"
-						>
-							<circle
-								cx="12"
-								cy="12"
-								r="5"
-							/>
-							<line
-								x1="12"
-								y1="1"
-								x2="12"
-								y2="3"
-							/>
-							<line
-								x1="12"
-								y1="21"
-								x2="12"
-								y2="23"
-							/>
-							<line
-								x1="4.22"
-								y1="4.22"
-								x2="5.64"
-								y2="5.64"
-							/>
-							<line
-								x1="18.36"
-								y1="18.36"
-								x2="19.78"
-								y2="19.78"
-							/>
-							<line
-								x1="1"
-								y1="12"
-								x2="3"
-								y2="12"
-							/>
-							<line
-								x1="21"
-								y1="12"
-								x2="23"
-								y2="12"
-							/>
-							<line
-								x1="4.22"
-								y1="19.78"
-								x2="5.64"
-								y2="18.36"
-							/>
-							<line
-								x1="18.36"
-								y1="5.64"
-								x2="19.78"
-								y2="4.22"
-							/>
-						</svg>
+						<IconSun id="icon-sun" class="w-4 h-4 hidden" aria-hidden="true" />
 					</button>
 					<SignOutButton client:load />
 					{/* Hamburger — visible below 985px */}
@@ -161,62 +87,8 @@ const isDemoUser =
 						aria-controls="mobile-nav"
 						class="nav:hidden p-1.5 rounded-full border border-hairline hover:bg-surface transition-colors cursor-pointer text-muted"
 					>
-						<svg
-							id="icon-hamburger"
-							xmlns="http://www.w3.org/2000/svg"
-							class="w-4 h-4"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							aria-hidden="true"
-						>
-							<line
-								x1="3"
-								y1="6"
-								x2="21"
-								y2="6"
-							/>
-							<line
-								x1="3"
-								y1="12"
-								x2="21"
-								y2="12"
-							/>
-							<line
-								x1="3"
-								y1="18"
-								x2="21"
-								y2="18"
-							/>
-						</svg>
-						<svg
-							id="icon-close"
-							xmlns="http://www.w3.org/2000/svg"
-							class="w-4 h-4 hidden"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							aria-hidden="true"
-						>
-							<line
-								x1="18"
-								y1="6"
-								x2="6"
-								y2="18"
-							/>
-							<line
-								x1="6"
-								y1="6"
-								x2="18"
-								y2="18"
-							/>
-						</svg>
+						<IconMenu id="icon-hamburger" class="w-4 h-4" aria-hidden="true" />
+						<IconX id="icon-close" class="w-4 h-4 hidden" aria-hidden="true" />
 					</button>
 				</div>
 			</nav>
@@ -226,7 +98,7 @@ const isDemoUser =
 				class="hidden nav:hidden border-t border-hairline"
 				aria-hidden="true"
 			>
-				<div class="max-w-7xl mx-auto px-6 py-4 flex flex-col gap-1">
+				<div class="max-w-7xl mx-auto px-4 xs:px-6 py-4 flex flex-col gap-1">
 					<a
 						href="/dashboard"
 						class:list={navClass(
