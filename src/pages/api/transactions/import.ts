@@ -2,7 +2,17 @@ import { db } from "@db/database";
 import { transactions } from "@db/schema";
 import { recalculateBalances } from "@lib/balance";
 import { parseCsv } from "@lib/csv";
+import { fetchUsersAndCategories } from "@lib/queries";
+import {
+	type Reference,
+	resolveReferenceOrError,
+} from "@lib/resolve-references";
 import type { APIRoute } from "astro";
+
+interface Lookups {
+	userRefs: Reference[];
+	categoryRefs: Reference[];
+}
 
 interface ImportRow {
 	name: string;
@@ -15,6 +25,7 @@ interface ImportRow {
 	categoryId?: string;
 	transactionGroupId?: string;
 	createdAt?: string;
+	createdByUserId?: string;
 }
 
 interface ValidatedRow {
@@ -28,6 +39,7 @@ interface ValidatedRow {
 	categoryId: string | null;
 	transactionGroupId: string | null;
 	createdAt: Date | null;
+	createdByUserId: string | null;
 }
 
 interface RowError {
@@ -35,7 +47,10 @@ interface RowError {
 	errors: string[];
 }
 
-function validateRows(rows: ImportRow[]): {
+function validateRows(
+	rows: ImportRow[],
+	lookups: Lookups,
+): {
 	validRows: ValidatedRow[];
 	errors: RowError[];
 } {
@@ -61,8 +76,47 @@ function validateRows(rows: ImportRow[]): {
 			rowErrors.push("amount must be a positive number");
 		}
 
+		// paidByUserId is required and is resolved from a UUID or a user name.
+		let resolvedPaidBy: string | null = null;
 		if (!row.paidByUserId || String(row.paidByUserId).trim().length === 0) {
 			rowErrors.push("paidByUserId is required");
+		} else {
+			const resolved = resolveReferenceOrError(
+				"paidByUserId",
+				"user",
+				String(row.paidByUserId),
+				lookups.userRefs,
+			);
+			if ("error" in resolved) rowErrors.push(resolved.error);
+			else resolvedPaidBy = resolved.id;
+		}
+
+		// createdByUserId is optional; when provided, resolve UUID or user name.
+		let resolvedCreatedBy: string | null = null;
+		const createdByRaw = row.createdByUserId?.trim();
+		if (createdByRaw) {
+			const resolved = resolveReferenceOrError(
+				"createdByUserId",
+				"user",
+				createdByRaw,
+				lookups.userRefs,
+			);
+			if ("error" in resolved) rowErrors.push(resolved.error);
+			else resolvedCreatedBy = resolved.id;
+		}
+
+		// categoryId is optional; when provided, resolve UUID or category label.
+		let resolvedCategory: string | null = null;
+		const categoryRaw = row.categoryId?.trim();
+		if (categoryRaw) {
+			const resolved = resolveReferenceOrError(
+				"categoryId",
+				"category",
+				categoryRaw,
+				lookups.categoryRefs,
+			);
+			if ("error" in resolved) rowErrors.push(resolved.error);
+			else resolvedCategory = resolved.id;
 		}
 
 		if (!["deposit", "withdrawal"].includes(row.type)) {
@@ -90,12 +144,13 @@ function validateRows(rows: ImportRow[]): {
 				date: txDate as Date,
 				remarks: row.remarks?.trim() || null,
 				amount: amount.toFixed(2),
-				paidByUserId: String(row.paidByUserId).trim(),
+				paidByUserId: resolvedPaidBy as string,
 				type: row.type as "deposit" | "withdrawal",
 				status: row.status as "pending" | "completed" | "cancelled",
-				categoryId: row.categoryId?.trim() || null,
+				categoryId: resolvedCategory,
 				transactionGroupId: row.transactionGroupId?.trim() || null,
 				createdAt: parsedCreatedAt,
+				createdByUserId: resolvedCreatedBy,
 			});
 		}
 	});
@@ -167,7 +222,15 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		return Response.json({ error: "No rows provided" }, { status: 400 });
 	}
 
-	const { validRows, errors } = validateRows(rawRows);
+	// Load known users/categories so id-or-name references can be resolved to
+	// real UUIDs before insertion.
+	const { users, categories } = await fetchUsersAndCategories();
+	const lookups: Lookups = {
+		userRefs: users.map((u) => ({ id: u.id, label: u.name })),
+		categoryRefs: categories.map((c) => ({ id: c.id, label: c.label })),
+	};
+
+	const { validRows, errors } = validateRows(rawRows, lookups);
 
 	// Reject entire import if any row has errors
 	if (errors.length > 0) {
@@ -192,7 +255,7 @@ export const POST: APIRoute = async ({ locals, request }) => {
 				status: row.status,
 				paidByUserId: row.paidByUserId,
 				categoryId: row.categoryId,
-				createdByUserId: sessionUser.id,
+				createdByUserId: row.createdByUserId ?? sessionUser.id,
 				createdAt: row.createdAt ?? now,
 				updatedAt: now,
 			});

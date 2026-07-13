@@ -1,14 +1,45 @@
 // @vitest-environment node
 import { db } from "@db/database";
 import * as balanceLib from "@lib/balance";
+import * as queriesLib from "@lib/queries";
 import { POST } from "@pages/api/transactions/import";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createChain } from "../../helpers/db";
 
 vi.mock("@lib/balance", () => ({ recalculateBalances: vi.fn() }));
+vi.mock("@lib/queries", () => ({ fetchUsersAndCategories: vi.fn() }));
 
 const mockDb = vi.mocked(db);
 const mockRecalculate = vi.mocked(balanceLib.recalculateBalances);
+const mockFetchLookups = vi.mocked(queriesLib.fetchUsersAndCategories);
+
+// Known users/categories the import route resolves references against. Ids like
+// "user-a" stand in for UUIDs; names/labels exercise the id-or-name matching.
+const lookupUsers = [
+	{ id: "user-a", name: "Alice Anderson", email: "alice@x.test" },
+	{ id: "user-b", name: "Bob Brown", email: "bob@x.test" },
+	{ id: "admin", name: "Admin Root", email: "admin@x.test" },
+	{ id: "user-sam1", name: "Sam Taylor", email: "sam1@x.test" },
+	{ id: "user-sam2", name: "Sam Rivera", email: "sam2@x.test" },
+];
+const lookupCategories = [
+	{ id: "cat-food", label: "Food" },
+	{ id: "cat-travel", label: "Travel" },
+];
+
+beforeEach(() => {
+	mockFetchLookups.mockResolvedValue({
+		users: lookupUsers,
+		categories: lookupCategories,
+	});
+});
+
+function insertedRows(tx: { insert: ReturnType<typeof vi.fn> }) {
+	return tx.insert.mock.results.map(
+		(r) =>
+			(r.value as { values: ReturnType<typeof vi.fn> }).values.mock.calls[0][0],
+	);
+}
 
 function makeLocals(user: { id: string; role: string } | null) {
 	return { user, session: null } as never;
@@ -193,6 +224,91 @@ describe("POST /api/transactions/import", () => {
 		expect(res.status).toBe(201);
 		const json = await res.json();
 		expect(json).toEqual({ imported: 2 });
+	});
+
+	it("defaults createdByUserId to the importing admin when omitted", async () => {
+		const tx = stubTransaction();
+		await POST({
+			locals: makeLocals({ id: "admin", role: "admin" }),
+			request: jsonRequest([validRow]),
+		} as never);
+
+		expect(insertedRows(tx)[0].createdByUserId).toBe("admin");
+	});
+
+	it("uses the row's createdByUserId when provided", async () => {
+		const tx = stubTransaction();
+		await POST({
+			locals: makeLocals({ id: "admin", role: "admin" }),
+			request: jsonRequest([{ ...validRow, createdByUserId: "user-b" }]),
+		} as never);
+
+		expect(insertedRows(tx)[0].createdByUserId).toBe("user-b");
+	});
+
+	it("resolves paidByUserId given as a partial name to the user's id", async () => {
+		const tx = stubTransaction();
+		const res = await POST({
+			locals: makeLocals({ id: "admin", role: "admin" }),
+			request: jsonRequest([{ ...validRow, paidByUserId: "alice" }]),
+		} as never);
+
+		expect(res.status).toBe(201);
+		expect(insertedRows(tx)[0].paidByUserId).toBe("user-a");
+	});
+
+	it("resolves categoryId given as a label to the category's id", async () => {
+		const tx = stubTransaction();
+		const res = await POST({
+			locals: makeLocals({ id: "admin", role: "admin" }),
+			request: jsonRequest([{ ...validRow, categoryId: "food" }]),
+		} as never);
+
+		expect(res.status).toBe(201);
+		expect(insertedRows(tx)[0].categoryId).toBe("cat-food");
+	});
+
+	it("resolves createdByUserId given as a name to the user's id", async () => {
+		const tx = stubTransaction();
+		await POST({
+			locals: makeLocals({ id: "admin", role: "admin" }),
+			request: jsonRequest([{ ...validRow, createdByUserId: "bob" }]),
+		} as never);
+
+		expect(insertedRows(tx)[0].createdByUserId).toBe("user-b");
+	});
+
+	it("recalculates balances against the resolved (not the raw) paidByUserId", async () => {
+		stubTransaction();
+		await POST({
+			locals: makeLocals({ id: "admin", role: "admin" }),
+			request: jsonRequest([{ ...validRow, paidByUserId: "alice" }]),
+		} as never);
+
+		expect(mockRecalculate).toHaveBeenCalledWith(["user-a"]);
+	});
+
+	it("returns 422 when a reference name matches no record", async () => {
+		const res = await POST({
+			locals: makeLocals({ id: "admin", role: "admin" }),
+			request: jsonRequest([{ ...validRow, paidByUserId: "nobody" }]),
+		} as never);
+
+		expect(res.status).toBe(422);
+		const json = await res.json();
+		expect(json.rowErrors).toHaveLength(1);
+		expect(json.rowErrors[0].errors[0]).toContain("did not match any user");
+	});
+
+	it("returns 422 when a reference name is ambiguous", async () => {
+		const res = await POST({
+			locals: makeLocals({ id: "admin", role: "admin" }),
+			request: jsonRequest([{ ...validRow, paidByUserId: "sam" }]),
+		} as never);
+
+		expect(res.status).toBe(422);
+		const json = await res.json();
+		expect(json.rowErrors[0].errors[0]).toContain("matches multiple users");
 	});
 
 	it("accepts a valid multipart/form-data CSV file upload", async () => {

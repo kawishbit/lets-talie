@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 // admin via authClient.admin.createUser() after this admin logs in.
 const ADMIN = {
 	name: "Kawish",
-	email: "testemail@gmail.com",
+	email: "demo@lets-talie-demo.kawishbit.com",
 	accountBalance: "0.00",
 };
 

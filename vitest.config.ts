@@ -19,6 +19,7 @@ export default getViteConfig({
 			include: [
 				"src/lib/balance.ts",
 				"src/lib/queries.ts",
+				"src/lib/resolve-references.ts",
 				"src/utils/date.ts",
 				"src/middleware.ts",
 				"src/pages/api/transactions/group/**/*.ts",

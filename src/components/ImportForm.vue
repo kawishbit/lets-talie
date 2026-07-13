@@ -1,5 +1,10 @@
 <script setup lang="ts">
 	import { parseCsv } from "@lib/csv";
+	import {
+		type Reference,
+		resolveReference,
+		resolveReferenceOrError,
+	} from "@lib/resolve-references";
 	import { computed, ref } from "vue";
 
 	interface ParsedRow {
@@ -14,12 +19,100 @@
 		categoryId?: string;
 		transactionGroupId?: string;
 		createdAt?: string;
+		createdByUserId?: string;
 		[key: string]: unknown;
 	}
 
 	interface RowError {
 		row: number;
 		errors: string[];
+	}
+
+	interface UserOption {
+		id: string;
+		name: string;
+		email: string;
+	}
+
+	interface CategoryOption {
+		id: string;
+		label: string;
+	}
+
+	const props = withDefaults(
+		defineProps<{
+			users?: UserOption[];
+			categories?: CategoryOption[];
+		}>(),
+		{ users: () => [], categories: () => [] },
+	);
+
+	const userRefs = computed<Reference[]>(() =>
+		props.users.map((u) => ({ id: u.id, label: u.name })),
+	);
+	const categoryRefs = computed<Reference[]>(() =>
+		props.categories.map((c) => ({ id: c.id, label: c.label })),
+	);
+
+	function isLookupColumn(col: string): boolean {
+		return (
+			col === "paidByUserId" ||
+			col === "createdByUserId" ||
+			col === "categoryId"
+		);
+	}
+
+	function candidatesFor(col: string): Reference[] {
+		if (col === "paidByUserId" || col === "createdByUserId") {
+			return userRefs.value;
+		}
+		if (col === "categoryId") return categoryRefs.value;
+		return [];
+	}
+
+	const referenceFields: { col: string; entity: string }[] = [
+		{ col: "paidByUserId", entity: "user" },
+		{ col: "createdByUserId", entity: "user" },
+		{ col: "categoryId", entity: "category" },
+	];
+
+	// Validates that each id-or-name reference actually resolves, using the same
+	// logic/messages as the server. Skipped when no lookup data is available
+	// (e.g. the component is mounted without users/categories) so the server
+	// stays the source of truth in that case.
+	function referenceErrors(row: ParsedRow): string[] {
+		const errs: string[] = [];
+		for (const { col, entity } of referenceFields) {
+			const raw = row[col];
+			if (typeof raw !== "string" || raw.trim() === "") continue;
+			const candidates = candidatesFor(col);
+			if (candidates.length === 0) continue;
+			const resolved = resolveReferenceOrError(col, entity, raw, candidates);
+			if ("error" in resolved) errs.push(resolved.error);
+		}
+		return errs;
+	}
+
+	// Resolved display label for an id-or-name reference (mirrors the server's
+	// import resolution), or null when the column isn't a reference / has no
+	// lookup data / can't be resolved.
+	function resolveLookupLabel(col: string, value: unknown): string | null {
+		if (!isLookupColumn(col)) return null;
+		if (typeof value !== "string" || value.trim() === "") return null;
+		const candidates = candidatesFor(col);
+		if (candidates.length === 0) return null;
+		const result = resolveReference(value, candidates);
+		return result.status === "resolved" ? result.label : null;
+	}
+
+	// A reference column with a value that has lookup data but doesn't resolve —
+	// flagged in red because the import would reject it.
+	function isUnresolvedLookup(col: string, value: unknown): boolean {
+		if (!isLookupColumn(col)) return false;
+		if (typeof value !== "string" || value.trim() === "") return false;
+		const candidates = candidatesFor(col);
+		if (candidates.length === 0) return false;
+		return resolveReference(value, candidates).status !== "resolved";
 	}
 
 	const fileInput = ref<HTMLInputElement | null>(null);
@@ -60,6 +153,7 @@
 		) {
 			errors.push('status must be "pending", "completed", or "cancelled"');
 		}
+		errors.push(...referenceErrors(row));
 		return errors;
 	}
 
@@ -133,13 +227,25 @@
 
 		try {
 			const file = fileInput.value.files[0];
-			const formData = new FormData();
-			formData.append("file", file);
+			const isJson =
+				file.name.endsWith(".json") || file.type === "application/json";
 
-			const res = await fetch("/api/transactions/import", {
-				method: "POST",
-				body: formData,
-			});
+			// JSON files are sent as an application/json body (the server parses
+			// multipart uploads as CSV), CSV files as multipart/form-data.
+			const res = isJson
+				? await fetch("/api/transactions/import", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: await file.text(),
+					})
+				: await (() => {
+						const formData = new FormData();
+						formData.append("file", file);
+						return fetch("/api/transactions/import", {
+							method: "POST",
+							body: formData,
+						});
+					})();
 
 			const data = await res.json();
 
@@ -180,6 +286,7 @@
 		"categoryId",
 		"transactionGroupId",
 		"createdAt",
+		"createdByUserId",
 	] as const;
 </script>
 
@@ -292,10 +399,20 @@
 									v-for="col in columns"
 									:key="col"
 									class="px-3 py-2 max-w-30 truncate"
+									:title="isLookupColumn(col) && resolveLookupLabel(col, row[col]) ? String(row[col]) : undefined"
 								>
-									<span v-if="row[col] !== undefined && row[col] !== ''"
-										>{{ row[col] }}</span
-									>
+									<template v-if="row[col] !== undefined && row[col] !== ''">
+										<span
+											v-if="isLookupColumn(col) && resolveLookupLabel(col, row[col])"
+										>
+											{{ resolveLookupLabel(col, row[col]) }}
+										</span>
+										<span
+											v-else
+											:class="isUnresolvedLookup(col, row[col]) ? 'text-error-text' : ''"
+											>{{ row[col] }}</span
+										>
+									</template>
 									<span v-else class="text-subtle">—</span>
 								</td>
 								<td class="px-3 py-2">
@@ -307,7 +424,7 @@
 											{{ err }}
 										</li>
 									</ul>
-									<span v-else class="text-badge-positive-text">✓</span>
+									<span v-else class="text-badge-positive-text">✅</span>
 								</td>
 							</tr>
 						</tbody>

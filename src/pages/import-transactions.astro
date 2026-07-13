@@ -1,6 +1,7 @@
 ---
 import ImportForm from "../components/ImportForm.vue";
 import Layout from "../layouts/Layout.astro";
+import { fetchUsersAndCategories } from "../lib/queries";
 
 if (!Astro.locals.user) {
 	return Astro.redirect("/login");
@@ -9,6 +10,8 @@ if (!Astro.locals.user) {
 if (Astro.locals.user.role !== "admin") {
 	return Astro.redirect("/dashboard");
 }
+
+const { users, categories } = await fetchUsersAndCategories();
 ---
 
 <Layout title="Import Transactions">
@@ -62,7 +65,7 @@ if (Astro.locals.user.role !== "admin") {
 						<tr class="border-b border-hairline">
 							<td class="pr-4 py-1.5">paidByUserId</td>
 							<td class="pr-4 py-1.5">string</td>
-							<td class="py-1.5">User ID from /users</td>
+							<td class="py-1.5">User ID or name (partial name allowed)</td>
 						</tr>
 						<tr class="border-b border-hairline">
 							<td class="pr-4 py-1.5">type</td>
@@ -82,17 +85,24 @@ if (Astro.locals.user.role !== "admin") {
 						<tr class="border-b border-hairline">
 							<td class="pr-4 py-1.5">categoryId</td>
 							<td class="pr-4 py-1.5">string</td>
-							<td class="py-1.5">Optional — category ID</td>
+							<td class="py-1.5">Optional — category ID or label</td>
 						</tr>
 						<tr class="border-b border-hairline">
 							<td class="pr-4 py-1.5">transactionGroupId</td>
 							<td class="pr-4 py-1.5">string</td>
 							<td class="py-1.5">Optional — group key to link rows</td>
 						</tr>
-						<tr>
+						<tr class="border-b border-hairline">
 							<td class="pr-4 py-1.5">createdAt</td>
 							<td class="pr-4 py-1.5">string</td>
 							<td class="py-1.5">Optional — ISO 8601 override</td>
+						</tr>
+						<tr>
+							<td class="pr-4 py-1.5">createdByUserId</td>
+							<td class="pr-4 py-1.5">string</td>
+							<td class="py-1.5">
+								Optional — user ID or name; defaults to the importing admin
+							</td>
 						</tr>
 					</tbody>
 				</table>
@@ -101,7 +111,7 @@ if (Astro.locals.user.role !== "admin") {
 
 		<!-- Form -->
 		<div class="border border-hairline rounded-2xl p-6">
-			<ImportForm client:load />
+			<ImportForm client:load users={users} categories={categories} />
 		</div>
 	</div>
 </Layout>
