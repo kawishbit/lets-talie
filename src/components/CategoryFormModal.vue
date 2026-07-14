@@ -90,7 +90,7 @@
 		<button
 			type="button"
 			aria-label="Close modal"
-			class="absolute inset-0 bg-(--color-modal-scrim) cursor-default w-full"
+			class="absolute inset-0 bg-modal-scrim cursor-default w-full"
 			@click="emit('close')"
 			@keydown.esc="emit('close')"
 		/>
@@ -137,7 +137,7 @@
 						for="modal-remarks"
 						class="text-xs font-medium uppercase tracking-wider text-label"
 						>Remarks
-						<span class="normal-case font-[400] text-muted"
+						<span class="normal-case font-normal text-muted"
 							>(optional)</span
 						></label
 					>
