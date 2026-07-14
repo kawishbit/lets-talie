@@ -23,7 +23,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-0.0.1-2f6fed?style=flat-square" />
+  <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-2f6fed?style=flat-square" />
   <img alt="License" src="https://img.shields.io/badge/license-MIT-0a0a0a?style=flat-square" />
   <img alt="Node" src="https://img.shields.io/badge/node-%3E%3D22-black?style=flat-square" />
   <img alt="PWA" src="https://img.shields.io/badge/PWA-installable-1f1d3d?style=flat-square" />
