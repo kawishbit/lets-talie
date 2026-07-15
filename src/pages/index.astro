@@ -1,81 +1,47 @@
 ---
 import Layout from "../layouts/Layout.astro";
+
+const steps = [
+	{
+		n: "01",
+		title: "Log a group expense",
+		body: "One person paid — record who, who was there, and the total. lets-talie splits it automatically.",
+	},
+	{
+		n: "02",
+		title: "See your running balance",
+		body: "Your dashboard shows exactly how much the group owes you, or you owe. Updated after every transaction.",
+	},
+	{
+		n: "03",
+		title: "Settle up",
+		body: "When a debt is cleared, record the settlement. Balances reset and everyone's on the same page.",
+	},
+];
 ---
 
 <Layout title="Home">
 	<!-- HERO -->
-	<section
-		style="max-width: 1280px; margin: 0 auto; padding: 96px 48px 80px; text-align: center;"
-	>
-		<p class="eyebrow" style="opacity: 0.45; margin-bottom: 28px;">
-			Group expense tracker
-		</p>
-		<h1
-			style="font-size: clamp(3rem, 9vw, 86px); font-weight: 340; line-height: 1.00; letter-spacing: -1.72px; margin-bottom: 28px;"
-		>
-			Know who owes what.
-		</h1>
-		<p
-			style="font-size: 20px; font-weight: 330; line-height: 1.40; letter-spacing: -0.14px; opacity: 0.6; max-width: 440px; margin: 0 auto 40px;"
-		>
+	<section class="hero">
+		<p class="eyebrow hero__eyebrow">Group expense tracker</p>
+		<h1 class="hero__title">Know who owes what.</h1>
+		<p class="hero__lead">
 			One running tab for your group — who paid, who owes, and how much.
 		</p>
 		<a href="/login" class="btn-primary">Get started</a>
 	</section>
 
 	<!-- NAVY COLOR BLOCK — How it works -->
-	<section style="max-width: 1280px; margin: 0 auto 96px; padding: 0 48px;">
-		<div
-			style="background: var(--color-block-navy); color: var(--color-inverse-ink); border-radius: 24px; padding: 64px;"
-		>
-			<p
-				class="eyebrow"
-				style="color: #fff; opacity: 0.4; margin-bottom: 20px;"
-			>
-				How it works
-			</p>
-			<h2
-				style="font-size: clamp(1.75rem, 4vw, 52px); font-weight: 340; line-height: 1.10; letter-spacing: -0.96px; margin-bottom: 56px; max-width: 440px;"
-			>
-				Three steps,<br>zero spreadsheets.
-			</h2>
-			<div
-				style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 48px;"
-			>
-				{[
-						{
-							n: "01",
-							title: "Log a group expense",
-							body: "One person paid — record who, who was there, and the total. lets-talie splits it automatically.",
-						},
-						{
-							n: "02",
-							title: "See your running balance",
-							body: "Your dashboard shows exactly how much the group owes you, or you owe. Updated after every transaction.",
-						},
-						{
-							n: "03",
-							title: "Settle up",
-							body: "When a debt is cleared, record the settlement. Balances reset and everyone's on the same page.",
-						},
-					].map(({ n, title, body }) => (
+	<section class="block-wrap">
+		<div class="block block--navy">
+			<p class="eyebrow block__eyebrow">How it works</p>
+			<h2 class="block__title">Three steps,<br>zero spreadsheets.</h2>
+			<div class="steps">
+				{steps.map(({ n, title, body }) => (
 						<div>
-							<p
-								class="eyebrow"
-								style="color: #fff; opacity: 0.35; margin-bottom: 12px;"
-							>
-								{n}
-							</p>
-							<h3
-								style="font-size: 18px; font-weight: 540; letter-spacing: -0.26px; line-height: 1.35; margin-bottom: 10px;"
-							>
-								{title}
-							</h3>
-							<p
-								style="font-size: 16px; font-weight: 330; line-height: 1.55; opacity: 0.5;"
-							>
-								{body}
-							</p>
+							<p class="eyebrow step__n">{n}</p>
+							<h3 class="step__title">{title}</h3>
+							<p class="step__body">{body}</p>
 						</div>
 					))}
 			</div>
@@ -83,24 +49,143 @@ import Layout from "../layouts/Layout.astro";
 	</section>
 
 	<!-- LIME COLOR BLOCK — CTA -->
-	<section style="max-width: 1280px; margin: 0 auto 96px; padding: 0 48px;">
-		<div
-			style="background: var(--color-block-lime); border-radius: 24px; padding: 64px;"
-		>
-			<p class="eyebrow" style="opacity: 0.5; margin-bottom: 20px;">
-				Ready to start?
-			</p>
-			<h2
-				style="font-size: clamp(1.75rem, 4vw, 48px); font-weight: 540; line-height: 1.10; letter-spacing: -0.96px; max-width: 400px; margin-bottom: 16px;"
-			>
+	<section class="block-wrap">
+		<div class="block block--lime">
+			<p class="eyebrow block__eyebrow">Ready to start?</p>
+			<h2 class="block__title block__title--cta">
 				Sign in. It takes ten seconds.
 			</h2>
-			<p
-				style="font-size: 16px; font-weight: 330; line-height: 1.55; opacity: 0.65; max-width: 340px; margin-bottom: 32px;"
-			>
+			<p class="block__lead">
 				No password needed — we'll send a magic link to your inbox.
 			</p>
 			<a href="/login" class="btn-primary">Sign in with email</a>
 		</div>
 	</section>
 </Layout>
+
+<style>
+	/* Fluid gutters and vertical rhythm keep the page composed from ~320px up
+			   to the 1280px max width without any hard breakpoints. */
+	.hero {
+		max-width: 1280px;
+		margin: 0 auto;
+		padding: clamp(3.5rem, 11vw, 96px) clamp(1.25rem, 5vw, 48px)
+			clamp(3rem, 9vw, 80px);
+		text-align: center;
+	}
+
+	.hero__eyebrow {
+		margin-bottom: 1.25rem;
+	}
+
+	.hero__title {
+		font-size: clamp(2.75rem, 12vw, 86px);
+		font-weight: 340;
+		line-height: 1.02;
+		letter-spacing: -0.03em;
+		margin: 0 0 1.25rem;
+	}
+
+	.hero__lead {
+		font-size: clamp(1.0625rem, 4.5vw, 20px);
+		font-weight: 330;
+		line-height: 1.45;
+		letter-spacing: -0.14px;
+		color: var(--color-muted);
+		max-width: 27rem;
+		margin: 0 auto 2rem;
+	}
+
+	.block-wrap {
+		max-width: 1280px;
+		margin: 0 auto clamp(3.5rem, 9vw, 96px);
+		padding: 0 clamp(1.25rem, 5vw, 48px);
+	}
+
+	.block {
+		border-radius: clamp(18px, 4vw, 24px);
+		padding: clamp(2rem, 7vw, 64px);
+	}
+
+	.block--navy {
+		background: var(--color-block-navy);
+		color: var(--color-inverse-ink);
+	}
+
+	.block--lime {
+		background: var(--color-block-lime);
+	}
+
+	.block__eyebrow {
+		margin-bottom: 1.25rem;
+	}
+
+	.block--navy .block__eyebrow {
+		color: var(--color-inverse-ink);
+		opacity: 0.5;
+	}
+
+	.block__title {
+		font-size: clamp(1.75rem, 7vw, 52px);
+		font-weight: 340;
+		line-height: 1.1;
+		letter-spacing: -0.02em;
+		max-width: 28rem;
+		margin: 0 0 clamp(2rem, 6vw, 56px);
+	}
+
+	.block__title--cta {
+		font-weight: 540;
+		max-width: 24rem;
+		margin-bottom: 1rem;
+	}
+
+	.block__lead {
+		font-size: clamp(1rem, 4vw, 16px);
+		font-weight: 330;
+		line-height: 1.55;
+		color: var(--color-muted);
+		max-width: 21rem;
+		margin: 0 0 2rem;
+	}
+
+	.steps {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: clamp(2rem, 5vw, 48px);
+	}
+
+	.step__n {
+		margin-bottom: 0.75rem;
+	}
+
+	.block--navy .step__n {
+		color: var(--color-inverse-ink);
+		opacity: 0.5;
+	}
+
+	.step__title {
+		font-size: 18px;
+		font-weight: 540;
+		letter-spacing: -0.26px;
+		line-height: 1.35;
+		margin: 0 0 0.625rem;
+	}
+
+	.step__body {
+		font-size: 16px;
+		font-weight: 330;
+		line-height: 1.55;
+		opacity: 0.55;
+		margin: 0;
+	}
+
+	/* Below 560px the primary CTA spans the content column so it reads as a
+			   deliberate full-width tap target rather than a stranded pill. */
+	@media (max-width: 560px) {
+		.btn-primary {
+			display: block;
+			text-align: center;
+		}
+	}
+</style>
