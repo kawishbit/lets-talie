@@ -1,8 +1,11 @@
 <script setup lang="ts">
-	import { formatDate } from "@utils/date.ts";
-	import { ref } from "vue";
+	import { formatDate, formatDateOnly } from "@utils/date.ts";
+	import { computed, ref } from "vue";
+	import IconBan from "~icons/lucide/ban";
+	import IconPencil from "~icons/lucide/pencil";
 	import { useServerTable } from "../composables/useServerTable";
 	import DataTable from "./DataTable.vue";
+	import TransactionFormModal from "./TransactionFormModal.vue";
 
 	interface TransactionRow {
 		id: string;
@@ -26,6 +29,12 @@
 		label: string;
 	}
 
+	interface UserOption {
+		id: string;
+		name: string;
+		email: string;
+	}
+
 	const props = defineProps<{
 		initialItems: TransactionRow[];
 		initialTotal: number;
@@ -33,6 +42,7 @@
 		pageSize: number;
 		isAdmin: boolean;
 		categories: CategoryOption[];
+		users?: UserOption[];
 	}>();
 
 	const filterStatus = ref("");
@@ -42,6 +52,15 @@
 	const filterDateTo = ref("");
 	const sortBy = ref("date");
 	const sortDir = ref<"asc" | "desc">("desc");
+
+	const showModal = ref(false);
+	const editingTx = ref<TransactionRow | null>(null);
+	const actionLoadingId = ref<string | null>(null);
+
+	const colSpan = computed(() => {
+		if (!props.isAdmin) return 7;
+		return 9; // + Paid by + Actions
+	});
 
 	const { items, total, page, loading, error, totalPages, load } =
 		useServerTable<TransactionRow>({
@@ -73,6 +92,58 @@
 		return id.replace(/-/g, "").slice(0, 6).toUpperCase();
 	}
 
+	function canEdit(row: TransactionRow): boolean {
+		return !row.deletedAt;
+	}
+
+	function canCancel(row: TransactionRow): boolean {
+		return !row.deletedAt && row.status !== "cancelled";
+	}
+
+	function openEdit(row: TransactionRow) {
+		editingTx.value = row;
+		showModal.value = true;
+	}
+
+	function closeModal() {
+		showModal.value = false;
+		editingTx.value = null;
+	}
+
+	async function onSaved() {
+		closeModal();
+		await load(page.value);
+	}
+
+	async function cancelTransaction(row: TransactionRow) {
+		if (
+			!confirm(
+				`Mark "${row.name}" as cancelled? This will recalculate balances if it was completed.`,
+			)
+		) {
+			return;
+		}
+		actionLoadingId.value = row.id;
+		error.value = "";
+		try {
+			const res = await fetch(`/api/transactions/${row.id}`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ status: "cancelled" }),
+			});
+			if (!res.ok) {
+				const data = await res.json();
+				error.value = data.error ?? "Failed to cancel transaction.";
+				return;
+			}
+			await load(page.value);
+		} catch {
+			error.value = "Network error. Please try again.";
+		} finally {
+			actionLoadingId.value = null;
+		}
+	}
+
 	function toggleSort(col: "date" | "amount") {
 		if (sortBy.value === col) {
 			sortDir.value = sortDir.value === "asc" ? "desc" : "asc";
@@ -87,6 +158,8 @@
 		return new Intl.NumberFormat("en-US", {
 			style: "currency",
 			currency: import.meta.env.PUBLIC_CURRENCY_CODE ?? "USD",
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
 		}).format(typeof val === "string" ? parseFloat(val) : val);
 	}
 
@@ -117,7 +190,7 @@
 		:page="page"
 		:total-pages="totalPages"
 		:total="total"
-		:col-span="7"
+		:col-span="colSpan"
 		empty-text="No transactions found."
 		item-label="transaction"
 		@paginate="load"
@@ -203,6 +276,12 @@
 				Created
 			</th>
 			<th
+				v-if="isAdmin"
+				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider whitespace-nowrap"
+			>
+				Paid by
+			</th>
+			<th
 				class="text-left px-4 py-3 font-medium text-label text-xs uppercase tracking-wider whitespace-nowrap"
 			>
 				Status
@@ -226,6 +305,12 @@
 					>{{ sortBy === 'amount' ? (sortDir === 'asc' ? '↑' : '↓') : '↕' }}</span
 				>
 			</th>
+			<th
+				v-if="isAdmin"
+				class="text-right px-4 py-3 font-medium text-label text-xs uppercase tracking-wider whitespace-nowrap"
+			>
+				Actions
+			</th>
 		</template>
 
 		<template #body>
@@ -235,6 +320,7 @@
 				:class="[
 					'border-b border-hairline transition-colors',
 					row.deletedAt ? 'opacity-40' : 'hover:bg-faint',
+					actionLoadingId === row.id ? 'opacity-50 pointer-events-none' : '',
 				]"
 			>
 				<td class="px-4 py-3">
@@ -249,10 +335,13 @@
 					</div>
 				</td>
 				<td class="px-4 py-3 text-muted whitespace-nowrap">
-					{{ formatDate(row.date) }}
+					{{ formatDateOnly(row.date) }}
 				</td>
 				<td class="px-4 py-3 text-muted whitespace-nowrap">
 					{{ formatDate(row.createdAt) }}
+				</td>
+				<td v-if="isAdmin" class="px-4 py-3 whitespace-nowrap">
+					{{ row.paidByUserName ?? row.paidByUserId }}
 				</td>
 				<td class="px-4 py-3 whitespace-nowrap">
 					<span
@@ -275,7 +364,46 @@
 				<td class="px-4 py-3 text-right font-medium whitespace-nowrap">
 					{{ formatCurrency(row.amount) }}
 				</td>
+				<td v-if="isAdmin" class="px-4 py-3">
+					<div
+						v-if="canEdit(row) || canCancel(row)"
+						class="flex items-center justify-end gap-1"
+					>
+						<button
+							v-if="canEdit(row)"
+							type="button"
+							@click="openEdit(row)"
+							class="p-1.5 rounded-full hover:bg-surface transition-colors text-label hover:text-ink cursor-pointer"
+							title="Edit"
+						>
+							<IconPencil class="w-4 h-4" aria-hidden="true" />
+						</button>
+						<button
+							v-if="canCancel(row)"
+							type="button"
+							@click="cancelTransaction(row)"
+							class="p-1.5 rounded-full hover:bg-error-bg transition-colors text-muted hover:text-red-600 cursor-pointer"
+							title="Mark as cancelled"
+						>
+							<IconBan class="w-4 h-4" aria-hidden="true" />
+						</button>
+					</div>
+					<span v-else class="text-subtle text-xs">—</span>
+				</td>
 			</tr>
+		</template>
+
+		<template #modals>
+			<Teleport to="body">
+				<TransactionFormModal
+					v-if="showModal && editingTx"
+					:transaction="editingTx"
+					:users="users ?? []"
+					:categories="categories"
+					@close="closeModal"
+					@saved="onSaved"
+				/>
+			</Teleport>
 		</template>
 	</DataTable>
 </template>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+	import { combineDateWithTime, toDateInputValue } from "@utils/date.ts";
 	import { computed, ref } from "vue";
 
 	interface UserOption {
@@ -18,7 +19,7 @@
 	}>();
 
 	const name = ref("");
-	const date = ref(new Date().toISOString().split("T")[0]);
+	const date = ref(toDateInputValue());
 	const remarks = ref("");
 	const amount = ref<number | "">("");
 	const paidByUserId = ref("");
@@ -47,7 +48,8 @@
 
 		const body: Record<string, unknown> = {
 			name: name.value.trim(),
-			date: date.value,
+			// Full ISO with current clock time — avoid date-only → UTC midnight
+			date: combineDateWithTime(date.value),
 			amount: Number(amount.value),
 			paidByUserId: paidByUserId.value,
 			type: type.value,
@@ -68,7 +70,7 @@
 			} else {
 				success.value = true;
 				name.value = "";
-				date.value = new Date().toISOString().split("T")[0];
+				date.value = toDateInputValue();
 				remarks.value = "";
 				amount.value = "";
 				paidByUserId.value = "";

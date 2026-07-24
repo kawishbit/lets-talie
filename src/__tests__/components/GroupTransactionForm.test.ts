@@ -139,6 +139,8 @@ describe("GroupTransactionForm", () => {
 			parties: ["user-a", "user-b"],
 		});
 		expect(body.customAmounts).toBeUndefined();
+		// Full ISO with time — not date-only YYYY-MM-DD
+		expect(body.date).toMatch(/^\d{4}-\d{2}-\d{2}T/);
 	});
 
 	it("submits customAmounts in the payload when custom split is enabled", async () => {

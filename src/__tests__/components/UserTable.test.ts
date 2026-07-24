@@ -59,6 +59,13 @@ describe("UserTable", () => {
 		expect(wrapper.text()).toContain("Bob");
 	});
 
+	it("formats balances with two decimal places", () => {
+		const wrapper = mountTable();
+		// en-US currency + always sign → e.g. "+$10.00", "−$5.00"
+		expect(wrapper.text()).toMatch(/\+.*10\.00/);
+		expect(wrapper.text()).toMatch(/[-−].*5\.00/);
+	});
+
 	it("opens the create modal when 'Add user' is clicked", async () => {
 		const wrapper = mountTable();
 		const addBtn = wrapper

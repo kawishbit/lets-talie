@@ -96,6 +96,8 @@
 			style: "currency",
 			currency: import.meta.env.PUBLIC_CURRENCY_CODE ?? "USD",
 			signDisplay: "always",
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
 		}).format(n);
 	}
 </script>

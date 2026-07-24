@@ -69,6 +69,8 @@ describe("SingleTransactionForm", () => {
 			type: "deposit",
 			status: "completed",
 		});
+		// Full ISO with time — not date-only YYYY-MM-DD
+		expect(body.date).toMatch(/^\d{4}-\d{2}-\d{2}T/);
 	});
 
 	it("shows an error message when the API request fails", async () => {

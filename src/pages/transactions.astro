@@ -1,5 +1,5 @@
 ---
-import { and, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
 import TransactionTable from "../components/TransactionTable.vue";
 import { db } from "../db/database";
 import { transactionCategories, transactions, user } from "../db/schema";
@@ -26,7 +26,7 @@ const whereClause = isAdmin
 			isNull(transactions.deletedAt),
 		);
 
-const [items, [{ total }], categories] = await Promise.all([
+const [items, [{ total }], categories, users] = await Promise.all([
 	db
 		.select({
 			id: transactions.id,
@@ -68,6 +68,14 @@ const [items, [{ total }], categories] = await Promise.all([
 		.from(transactionCategories)
 		.where(isNull(transactionCategories.deletedAt))
 		.orderBy(transactionCategories.label),
+
+	isAdmin
+		? db
+				.select({ id: user.id, name: user.name, email: user.email })
+				.from(user)
+				.where(isNull(user.deletedAt))
+				.orderBy(asc(user.name))
+		: Promise.resolve([] as { id: string; name: string; email: string }[]),
 ]);
 
 const txItems = items.map((t) => ({
@@ -116,6 +124,7 @@ const txItems = items.map((t) => ({
 			pageSize={PAGE_SIZE}
 			isAdmin={isAdmin}
 			categories={categories}
+			users={users}
 		/>
 	</div>
 </Layout>
