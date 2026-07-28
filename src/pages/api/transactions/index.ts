@@ -1,7 +1,7 @@
 import { db } from "@db/database";
 import { transactionCategories, transactions, user } from "@db/schema";
 import type { APIRoute } from "astro";
-import { and, asc, between, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, between, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 
 const DEFAULT_PAGE_SIZE = 25;
 
@@ -32,6 +32,8 @@ export const GET: APIRoute = async ({ locals, url }) => {
 	const filterStatus = url.searchParams.get("status") ?? "";
 	const filterType = url.searchParams.get("type") ?? "";
 	const filterCategoryId = url.searchParams.get("categoryId") ?? "";
+	const filterUserId = url.searchParams.get("userId") ?? "";
+	const filterName = url.searchParams.get("name")?.trim() ?? "";
 	const filterDateFrom = url.searchParams.get("dateFrom") ?? "";
 	const filterDateTo = url.searchParams.get("dateTo") ?? "";
 
@@ -55,6 +57,15 @@ export const GET: APIRoute = async ({ locals, url }) => {
 
 	if (filterCategoryId) {
 		conditions.push(eq(transactions.categoryId, filterCategoryId));
+	}
+
+	// Only admins may filter by an arbitrary user; regular users are already scoped to themselves above.
+	if (isAdmin && filterUserId) {
+		conditions.push(eq(transactions.paidByUserId, filterUserId));
+	}
+
+	if (filterName) {
+		conditions.push(ilike(transactions.name, `%${filterName}%`));
 	}
 
 	if (filterDateFrom && filterDateTo) {

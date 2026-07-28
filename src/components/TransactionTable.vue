@@ -48,10 +48,18 @@
 	const filterStatus = ref("");
 	const filterType = ref("");
 	const filterCategoryId = ref("");
+	const filterUserId = ref("");
+	const filterName = ref("");
 	const filterDateFrom = ref("");
 	const filterDateTo = ref("");
 	const sortBy = ref("date");
 	const sortDir = ref<"asc" | "desc">("desc");
+
+	let searchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
+	function onSearchInput() {
+		clearTimeout(searchDebounceTimer);
+		searchDebounceTimer = setTimeout(() => load(1), 300);
+	}
 
 	const showModal = ref(false);
 	const editingTx = ref<TransactionRow | null>(null);
@@ -79,6 +87,9 @@
 				if (filterType.value) params.set("type", filterType.value);
 				if (filterCategoryId.value)
 					params.set("categoryId", filterCategoryId.value);
+				if (filterUserId.value) params.set("userId", filterUserId.value);
+				if (filterName.value.trim())
+					params.set("name", filterName.value.trim());
 				if (filterDateFrom.value) params.set("dateFrom", filterDateFrom.value);
 				if (filterDateTo.value) params.set("dateTo", filterDateTo.value);
 				const res = await fetch(`/api/transactions?${params}`);
@@ -197,6 +208,26 @@
 	>
 		<template #toolbar>
 			<div class="flex flex-col sm:flex-row flex-wrap gap-2 mb-5">
+				<input
+					v-model="filterName"
+					@input="onSearchInput"
+					type="text"
+					placeholder="Search by name..."
+					class="px-3 py-2 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
+				>
+
+				<select
+					v-if="isAdmin && users && users.length"
+					v-model="filterUserId"
+					@change="load(1)"
+					class="px-3 py-2 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
+				>
+					<option value="">All users</option>
+					<option v-for="u in users" :key="u.id" :value="u.id">
+						{{ u.name }}
+					</option>
+				</select>
+
 				<select
 					v-model="filterStatus"
 					@change="load(1)"
@@ -245,9 +276,9 @@
 				>
 
 				<button
-					v-if="filterStatus || filterType || filterCategoryId || filterDateFrom || filterDateTo"
+					v-if="filterName || filterUserId || filterStatus || filterType || filterCategoryId || filterDateFrom || filterDateTo"
 					type="button"
-					@click="() => { filterStatus = ''; filterType = ''; filterCategoryId = ''; filterDateFrom = ''; filterDateTo = ''; load(1); }"
+					@click="() => { filterName = ''; filterUserId = ''; filterStatus = ''; filterType = ''; filterCategoryId = ''; filterDateFrom = ''; filterDateTo = ''; load(1); }"
 					class="px-3 py-2 rounded-xl border border-hairline text-sm text-muted hover:text-ink hover:border-ink transition-colors bg-(--color-input-bg) cursor-pointer"
 				>
 					Clear

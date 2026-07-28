@@ -85,6 +85,45 @@ describe("GET /api/transactions", () => {
 		expect(body.items[0].categoryId).toBe(cat.id);
 	});
 
+	it("?userId filters by paid-by user (admin only)", async () => {
+		const admin = await seedAdmin();
+		const other = await seedUser();
+		await seedTransaction({ paidByUserId: admin.id, name: "Admin tx" });
+		await seedTransaction({ paidByUserId: other.id, name: "Other tx" });
+		const cookie = await sessionCookieFor(admin.id);
+
+		const res = await apiFetch(`/api/transactions?userId=${other.id}`, {
+			cookie,
+		});
+		const body = (await res.json()) as { items: { name: string }[] };
+		expect(body.items.map((t) => t.name)).toEqual(["Other tx"]);
+	});
+
+	it("?userId is ignored for a regular user (already scoped to themselves)", async () => {
+		const user = await seedUser();
+		const other = await seedUser();
+		await seedTransaction({ paidByUserId: user.id, name: "Mine" });
+		await seedTransaction({ paidByUserId: other.id, name: "Not mine" });
+		const cookie = await sessionCookieFor(user.id);
+
+		const res = await apiFetch(`/api/transactions?userId=${other.id}`, {
+			cookie,
+		});
+		const body = (await res.json()) as { items: { name: string }[] };
+		expect(body.items.map((t) => t.name)).toEqual(["Mine"]);
+	});
+
+	it("?name filters by a case-insensitive partial match", async () => {
+		const user = await seedUser();
+		await seedTransaction({ paidByUserId: user.id, name: "Grocery run" });
+		await seedTransaction({ paidByUserId: user.id, name: "Movie night" });
+		const cookie = await sessionCookieFor(user.id);
+
+		const res = await apiFetch("/api/transactions?name=groc", { cookie });
+		const body = (await res.json()) as { items: { name: string }[] };
+		expect(body.items.map((t) => t.name)).toEqual(["Grocery run"]);
+	});
+
 	it("?dateFrom&dateTo filters by inclusive date range", async () => {
 		const user = await seedUser();
 		await seedTransaction({
