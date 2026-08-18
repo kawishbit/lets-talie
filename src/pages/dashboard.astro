@@ -90,6 +90,7 @@ const balanceFormatted = new Intl.NumberFormat("en-US", {
 						client:load
 						users={users}
 						categories={categories}
+						isAdmin={currentUser.role === "admin"}
 					/>
 				</div>
 			</div>

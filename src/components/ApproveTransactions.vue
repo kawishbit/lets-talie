@@ -5,11 +5,13 @@
 	import IconX from "~icons/lucide/x";
 	import { useServerTable } from "../composables/useServerTable";
 
-	interface PendingGroup {
-		groupId: string;
+	interface PendingEntry {
+		id: string;
+		kind: "group" | "single";
 		name: string;
 		date: string;
 		totalAmount: string;
+		type: "deposit" | "withdrawal";
 		paidByUserName: string | null;
 		paidByUserId: string;
 		parties: { userId: string; userName: string | null; amount: string }[];
@@ -18,13 +20,13 @@
 	}
 
 	const props = defineProps<{
-		initialGroups: PendingGroup[];
+		initialGroups: PendingEntry[];
 		initialTotal: number;
 		initialPage: number;
 		pageSize: number;
 	}>();
 
-	const loadingGroupId = ref<string | null>(null);
+	const loadingId = ref<string | null>(null);
 
 	const {
 		items: groups,
@@ -34,7 +36,7 @@
 		error,
 		totalPages,
 		load,
-	} = useServerTable<PendingGroup>({
+	} = useServerTable<PendingEntry>({
 		pageSize: props.pageSize,
 		initialItems: props.initialGroups,
 		initialTotal: props.initialTotal,
@@ -61,30 +63,43 @@
 		}).format(typeof val === "string" ? parseFloat(val) : val);
 	}
 
-	async function handleAction(groupId: string, action: "approve" | "reject") {
+	async function handleAction(
+		entry: PendingEntry,
+		action: "approve" | "reject",
+	) {
 		const label = action === "approve" ? "Approve" : "Reject";
-		if (!confirm(`${label} this transaction group?`)) return;
+		const noun = entry.kind === "group" ? "transaction group" : "transaction";
+		if (!confirm(`${label} this ${noun}?`)) return;
 
-		loadingGroupId.value = groupId;
+		loadingId.value = entry.id;
 		error.value = "";
 		try {
-			const res = await fetch(`/api/transactions/group/${groupId}/status`, {
-				method: "PATCH",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ action }),
-			});
+			const res =
+				entry.kind === "group"
+					? await fetch(`/api/transactions/group/${entry.id}/status`, {
+							method: "PATCH",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ action }),
+						})
+					: await fetch(`/api/transactions/${entry.id}`, {
+							method: "PATCH",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({
+								status: action === "approve" ? "completed" : "cancelled",
+							}),
+						});
 			if (!res.ok) {
 				const data = await res.json();
-				error.value = data.error ?? `Failed to ${action} group.`;
+				error.value = data.error ?? `Failed to ${action} ${noun}.`;
 				return;
 			}
 			// Remove from local list
-			groups.value = groups.value.filter((g) => g.groupId !== groupId);
+			groups.value = groups.value.filter((g) => g.id !== entry.id);
 			total.value = Math.max(0, total.value - 1);
 		} catch {
 			error.value = "Network error. Please try again.";
 		} finally {
-			loadingGroupId.value = null;
+			loadingId.value = null;
 		}
 	}
 </script>
@@ -102,10 +117,10 @@
 	<div v-else class="flex flex-col gap-4">
 		<div
 			v-for="group in groups"
-			:key="group.groupId"
+			:key="group.id"
 			:class="[
         'border border-hairline rounded-2xl p-5 transition-opacity',
-        loadingGroupId === group.groupId ? 'opacity-50 pointer-events-none' : '',
+        loadingId === group.id ? 'opacity-50 pointer-events-none' : '',
       ]"
 		>
 			<!-- Group header -->
@@ -113,9 +128,16 @@
 				class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4"
 			>
 				<div>
-					<p class="font-medium text-base tracking-[-0.01em]">
-						{{ group.name }}
-					</p>
+					<div class="flex items-center gap-2">
+						<p class="font-medium text-base tracking-[-0.01em]">
+							{{ group.name }}
+						</p>
+						<span
+							class="font-mono text-[10px] uppercase tracking-wider text-subtle border border-hairline rounded-full px-2 py-0.5"
+						>
+							{{ group.kind === 'group' ? 'Group' : group.type }}
+						</span>
+					</div>
 					<p class="text-xs text-muted mt-0.5 font-mono">
 						{{ formatDate(group.date) }}
 					</p>
@@ -158,8 +180,11 @@
 				</div>
 			</div>
 
-			<!-- Parties breakdown -->
-			<div class="bg-surface rounded-xl px-4 py-3 mb-4">
+			<!-- Parties breakdown (groups only) -->
+			<div
+				v-if="group.kind === 'group'"
+				class="bg-surface rounded-xl px-4 py-3 mb-4"
+			>
 				<p
 					class="font-mono text-[10px] uppercase tracking-wider text-subtle mb-2"
 				>
@@ -181,7 +206,7 @@
 			<div class="flex items-center gap-2">
 				<button
 					type="button"
-					@click="handleAction(group.groupId, 'approve')"
+					@click="handleAction(group, 'approve')"
 					class="inline-flex items-center gap-1.5 bg-ink text-(--color-canvas) px-4 py-2 rounded-full text-sm font-[480] tracking-[-0.01em] hover:opacity-80 transition-opacity cursor-pointer"
 				>
 					<IconCheck class="w-4 h-4" aria-hidden="true" />
@@ -189,7 +214,7 @@
 				</button>
 				<button
 					type="button"
-					@click="handleAction(group.groupId, 'reject')"
+					@click="handleAction(group, 'reject')"
 					class="inline-flex items-center gap-1.5 border border-hairline text-muted px-4 py-2 rounded-full text-sm font-[480] tracking-[-0.01em] hover:border-red-300 hover:text-red-600 transition-colors cursor-pointer"
 				>
 					<IconX class="w-4 h-4" aria-hidden="true" />
@@ -202,7 +227,7 @@
 	<!-- Pagination -->
 	<div v-if="totalPages > 1" class="flex items-center justify-between mt-6">
 		<p class="text-sm text-muted">
-			{{ total }}&nbsp; pending group{{ total === 1 ? '' : 's' }}
+			{{ total }}&nbsp; pending transaction{{ total === 1 ? '' : 's' }}
 		</p>
 		<div class="flex items-center gap-1">
 			<button

@@ -10,7 +10,7 @@ interface SingleTransactionBody {
 	amount: number;
 	paidByUserId: string;
 	type: "deposit" | "withdrawal";
-	status: "pending" | "completed" | "cancelled";
+	status?: "pending" | "completed" | "cancelled";
 	categoryId?: string;
 }
 
@@ -20,6 +20,8 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		return Response.json({ error: "Unauthorized" }, { status: 401 });
 	}
 
+	const isAdmin = sessionUser.role === "admin";
+
 	let body: SingleTransactionBody;
 	try {
 		body = await request.json();
@@ -27,14 +29,16 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		return Response.json({ error: "Invalid JSON body" }, { status: 400 });
 	}
 
-	const { name, date, amount, paidByUserId, type, status } = body;
+	const { name, date, amount, paidByUserId, type } = body;
 	if (
 		!name ||
 		!date ||
 		typeof amount !== "number" ||
 		!paidByUserId ||
 		!["deposit", "withdrawal"].includes(type) ||
-		!["pending", "completed", "cancelled"].includes(status)
+		(isAdmin &&
+			body.status !== undefined &&
+			!["pending", "completed", "cancelled"].includes(body.status))
 	) {
 		return Response.json(
 			{
@@ -44,6 +48,10 @@ export const POST: APIRoute = async ({ locals, request }) => {
 			{ status: 400 },
 		);
 	}
+
+	// Only admins may set status directly — regular users' transactions are
+	// always pending until an admin approves them.
+	const status = isAdmin ? (body.status ?? "completed") : "pending";
 
 	if (amount <= 0) {
 		return Response.json(

@@ -13,9 +13,10 @@
 		label: string;
 	}
 
-	defineProps<{
+	const props = defineProps<{
 		users: UserOption[];
 		categories: CategoryOption[];
+		isAdmin: boolean;
 	}>();
 
 	const name = ref("");
@@ -53,8 +54,10 @@
 			amount: Number(amount.value),
 			paidByUserId: paidByUserId.value,
 			type: type.value,
-			status: status.value,
 		};
+		// Non-admins can't set status — the server always makes their
+		// transactions pending until an admin approves them.
+		if (props.isAdmin) body.status = status.value;
 		if (remarks.value.trim()) body.remarks = remarks.value.trim();
 		if (categoryId.value) body.categoryId = categoryId.value;
 
@@ -172,7 +175,10 @@
 		</div>
 
 		<!-- Type + Status row -->
-		<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+		<div
+			class="grid grid-cols-1 gap-3"
+			:class="isAdmin ? 'sm:grid-cols-2' : ''"
+		>
 			<div class="flex flex-col gap-1.5">
 				<label
 					for="tx-type"
@@ -188,7 +194,7 @@
 					<option value="withdrawal">Withdrawal</option>
 				</select>
 			</div>
-			<div class="flex flex-col gap-1.5">
+			<div v-if="isAdmin" class="flex flex-col gap-1.5">
 				<label
 					for="tx-status"
 					class="text-xs font-medium uppercase tracking-wider text-label"
@@ -205,6 +211,9 @@
 				</select>
 			</div>
 		</div>
+		<p v-if="!isAdmin" class="text-xs text-muted -mt-2">
+			Submitted for admin approval — it'll be pending until reviewed.
+		</p>
 
 		<!-- Category -->
 		<div v-if="categories.length > 0" class="flex flex-col gap-1.5">

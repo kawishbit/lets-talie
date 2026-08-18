@@ -5,8 +5,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const users = [{ id: "user-a", name: "Alice", email: "alice@example.com" }];
 const categories = [{ id: "cat-1", label: "Food" }];
 
-function mountForm() {
-	return mount(SingleTransactionForm, { props: { users, categories } });
+function mountForm(isAdmin: boolean) {
+	return mount(SingleTransactionForm, {
+		props: { users, categories, isAdmin },
+	});
 }
 
 beforeEach(() => {
@@ -21,8 +23,8 @@ afterEach(() => {
 });
 
 describe("SingleTransactionForm", () => {
-	it("renders name, date, amount, user, type, and status fields", () => {
-		const wrapper = mountForm();
+	it("renders name, date, amount, user, type, and status fields for admins", () => {
+		const wrapper = mountForm(true);
 		expect(wrapper.find("#tx-name").exists()).toBe(true);
 		expect(wrapper.find("#tx-date").exists()).toBe(true);
 		expect(wrapper.find("#tx-amount").exists()).toBe(true);
@@ -31,8 +33,14 @@ describe("SingleTransactionForm", () => {
 		expect(wrapper.find("#tx-status").exists()).toBe(true);
 	});
 
+	it("hides the status field for non-admins", () => {
+		const wrapper = mountForm(false);
+		expect(wrapper.find("#tx-status").exists()).toBe(false);
+		expect(wrapper.text()).toContain("Submitted for admin approval");
+	});
+
 	it("disables submit until required fields are filled", async () => {
-		const wrapper = mountForm();
+		const wrapper = mountForm(true);
 		expect(
 			wrapper.find('button[type="submit"]').attributes("disabled"),
 		).toBeDefined();
@@ -46,8 +54,8 @@ describe("SingleTransactionForm", () => {
 		).toBeUndefined();
 	});
 
-	it("submits the correct payload to the API", async () => {
-		const wrapper = mountForm();
+	it("submits the correct payload to the API for admins", async () => {
+		const wrapper = mountForm(true);
 		await wrapper.find("#tx-name").setValue("Adjustment");
 		await wrapper.find("#tx-amount").setValue("20");
 		await wrapper.find("#tx-user").setValue("user-a");
@@ -73,6 +81,20 @@ describe("SingleTransactionForm", () => {
 		expect(body.date).toMatch(/^\d{4}-\d{2}-\d{2}T/);
 	});
 
+	it("omits status from the payload for non-admins", async () => {
+		const wrapper = mountForm(false);
+		await wrapper.find("#tx-name").setValue("Adjustment");
+		await wrapper.find("#tx-amount").setValue("20");
+		await wrapper.find("#tx-user").setValue("user-a");
+
+		await wrapper.find("form").trigger("submit.prevent");
+		await flushPromises();
+
+		const call = vi.mocked(fetch).mock.calls[0];
+		const body = JSON.parse(call[1]?.body as string);
+		expect(body).not.toHaveProperty("status");
+	});
+
 	it("shows an error message when the API request fails", async () => {
 		vi.stubGlobal(
 			"fetch",
@@ -81,7 +103,7 @@ describe("SingleTransactionForm", () => {
 				json: async () => ({ error: "Invalid payload" }),
 			}),
 		);
-		const wrapper = mountForm();
+		const wrapper = mountForm(true);
 		await wrapper.find("#tx-name").setValue("Adjustment");
 		await wrapper.find("#tx-amount").setValue("20");
 		await wrapper.find("#tx-user").setValue("user-a");

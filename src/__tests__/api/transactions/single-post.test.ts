@@ -46,11 +46,18 @@ describe("POST /api/transactions/single", () => {
 		["amount", { ...validBody, amount: "20" }],
 		["paidByUserId", { ...validBody, paidByUserId: "" }],
 		["type", { ...validBody, type: "invalid" }],
-		["status", { ...validBody, status: "invalid" }],
 	])("returns 400 when %s is missing or invalid", async (_field, body) => {
 		const res = await POST({
 			locals: makeLocals({ id: "user-a", role: "user" }),
 			request: makeRequest(body),
+		} as never);
+		expect(res.status).toBe(400);
+	});
+
+	it("returns 400 when an admin sends an invalid status", async () => {
+		const res = await POST({
+			locals: makeLocals({ id: "admin-a", role: "admin" }),
+			request: makeRequest({ ...validBody, status: "invalid" }),
 		} as never);
 		expect(res.status).toBe(400);
 	});
@@ -71,12 +78,12 @@ describe("POST /api/transactions/single", () => {
 		expect(res.status).toBe(400);
 	});
 
-	it("inserts a single transaction record on valid input", async () => {
+	it("inserts an admin's transaction with the requested status", async () => {
 		const insertChain = createChain(undefined);
 		mockDb.insert.mockReturnValue(insertChain as never);
 
 		const res = await POST({
-			locals: makeLocals({ id: "user-a", role: "user" }),
+			locals: makeLocals({ id: "admin-a", role: "admin" }),
 			request: makeRequest(validBody),
 		} as never);
 
@@ -94,11 +101,46 @@ describe("POST /api/transactions/single", () => {
 		);
 	});
 
-	it("calls recalculateBalances only when status is completed", async () => {
-		mockDb.insert.mockReturnValue(createChain(undefined) as never);
+	it("defaults an admin's transaction to completed when status is omitted", async () => {
+		const insertChain = createChain(undefined);
+		mockDb.insert.mockReturnValue(insertChain as never);
+		const { status: _status, ...bodyWithoutStatus } = validBody;
+
+		await POST({
+			locals: makeLocals({ id: "admin-a", role: "admin" }),
+			request: makeRequest(bodyWithoutStatus),
+		} as never);
+
+		expect(insertChain.values).toHaveBeenCalledWith(
+			expect.objectContaining({ status: "completed" }),
+		);
+	});
+
+	it.each([
+		"completed",
+		"pending",
+		"cancelled",
+		undefined,
+	])("forces a regular user's transaction to pending regardless of requested status %s", async (status) => {
+		const insertChain = createChain(undefined);
+		mockDb.insert.mockReturnValue(insertChain as never);
 
 		await POST({
 			locals: makeLocals({ id: "user-a", role: "user" }),
+			request: makeRequest({ ...validBody, status }),
+		} as never);
+
+		expect(insertChain.values).toHaveBeenCalledWith(
+			expect.objectContaining({ status: "pending" }),
+		);
+		expect(mockRecalculate).not.toHaveBeenCalled();
+	});
+
+	it("calls recalculateBalances when an admin's transaction is completed", async () => {
+		mockDb.insert.mockReturnValue(createChain(undefined) as never);
+
+		await POST({
+			locals: makeLocals({ id: "admin-a", role: "admin" }),
 			request: makeRequest({ ...validBody, status: "completed" }),
 		} as never);
 
@@ -108,11 +150,11 @@ describe("POST /api/transactions/single", () => {
 	it.each([
 		"pending",
 		"cancelled",
-	])("does not call recalculateBalances when status is %s", async (status) => {
+	])("does not call recalculateBalances when an admin sets status to %s", async (status) => {
 		mockDb.insert.mockReturnValue(createChain(undefined) as never);
 
 		await POST({
-			locals: makeLocals({ id: "user-a", role: "user" }),
+			locals: makeLocals({ id: "admin-a", role: "admin" }),
 			request: makeRequest({ ...validBody, status }),
 		} as never);
 
