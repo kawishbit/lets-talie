@@ -2,7 +2,24 @@ import ApproveTransactions from "@components/ApproveTransactions.vue";
 import { flushPromises, mount } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const groupEntry = {
+// Mirrors the PendingEntry interface in ApproveTransactions.vue. The fixtures
+// need it explicitly: without it TS widens `kind`/`type` to string and infers
+// the nullable fields from groupEntry alone, so singleEntry stops matching.
+interface PendingEntry {
+	id: string;
+	kind: "group" | "single";
+	name: string;
+	date: string;
+	totalAmount: string;
+	type: "deposit" | "withdrawal";
+	paidByUserName: string | null;
+	paidByUserId: string;
+	parties: { userId: string; userName: string | null; amount: string }[];
+	categoryLabel: string | null;
+	createdAt: string;
+}
+
+const groupEntry: PendingEntry = {
 	id: "g1",
 	kind: "group",
 	name: "Dinner",
@@ -19,7 +36,7 @@ const groupEntry = {
 	createdAt: "2026-01-10T12:00:00.000Z",
 };
 
-const singleEntry = {
+const singleEntry: PendingEntry = {
 	id: "s1",
 	kind: "single",
 	name: "Cash top-up",
@@ -33,7 +50,7 @@ const singleEntry = {
 	createdAt: "2026-01-11T12:00:00.000Z",
 };
 
-function mountList(initialGroups = [groupEntry]) {
+function mountList(initialGroups: PendingEntry[] = [groupEntry]) {
 	return mount(ApproveTransactions, {
 		props: {
 			initialGroups,
