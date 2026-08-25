@@ -2,9 +2,11 @@
 	import { formatDate, formatDateOnly } from "@utils/date.ts";
 	import { computed, ref } from "vue";
 	import IconBan from "~icons/lucide/ban";
+	import IconMessageSquareText from "~icons/lucide/message-square-text";
 	import IconPencil from "~icons/lucide/pencil";
 	import { useServerTable } from "../composables/useServerTable";
 	import DataTable from "./DataTable.vue";
+	import RemarksModal from "./RemarksModal.vue";
 	import TransactionFormModal from "./TransactionFormModal.vue";
 
 	interface TransactionRow {
@@ -63,6 +65,7 @@
 
 	const showModal = ref(false);
 	const editingTx = ref<TransactionRow | null>(null);
+	const remarksTx = ref<TransactionRow | null>(null);
 	const actionLoadingId = ref<string | null>(null);
 
 	const colSpan = computed(() => {
@@ -119,6 +122,14 @@
 	function closeModal() {
 		showModal.value = false;
 		editingTx.value = null;
+	}
+
+	function openRemarks(row: TransactionRow) {
+		remarksTx.value = row;
+	}
+
+	function closeRemarks() {
+		remarksTx.value = null;
 	}
 
 	async function onSaved() {
@@ -217,7 +228,7 @@
 				>
 
 				<select
-					v-if="isAdmin && users && users.length"
+					v-if="isAdmin && users?.length"
 					v-model="filterUserId"
 					@change="load(1)"
 					class="px-3 py-2 rounded-xl border border-hairline text-sm outline-none focus:border-ink transition-colors bg-(--color-input-bg)"
@@ -356,7 +367,18 @@
 			>
 				<td class="px-4 py-3">
 					<div class="flex flex-col gap-0.5">
-						<span class="whitespace-nowrap">{{ row.name }}</span>
+						<span class="flex items-center gap-1.5 whitespace-nowrap">
+							{{ row.name }}
+							<button
+								v-if="row.remarks"
+								type="button"
+								@click="openRemarks(row)"
+								class="p-1 rounded-full hover:bg-surface transition-colors text-muted hover:text-ink cursor-pointer"
+								title="View remarks"
+							>
+								<IconMessageSquareText class="w-3.5 h-3.5" aria-hidden="true" />
+							</button>
+						</span>
 						<span
 							v-if="row.transactionGroupId"
 							class="font-mono text-[10px] text-muted tracking-wider"
@@ -433,6 +455,14 @@
 					:categories="categories"
 					@close="closeModal"
 					@saved="onSaved"
+				/>
+			</Teleport>
+			<Teleport to="body">
+				<RemarksModal
+					v-if="remarksTx"
+					:name="remarksTx.name"
+					:remarks="remarksTx.remarks ?? ''"
+					@close="closeRemarks"
 				/>
 			</Teleport>
 		</template>
