@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="424" viewBox="0 0 1200 424"
+     role="img" aria-labelledby="split-title split-desc">
+  <title id="split-title">How a group transaction becomes balances</title>
+  <desc id="split-desc">Ana pays 30.00 for an Uber shared three ways. Each party owes a 10.00 share, so Ana's balance moves plus 20.00 while Ben and Cass each move minus 10.00. Balance equals the sum of deposits minus the sum of withdrawals over completed transactions.</desc>
+
+  <rect x="1.5" y="1.5" width="1197" height="421" rx="26" fill="#DDFFF7" stroke="#00774D" stroke-width="3"/>
+
+  <!-- ── step labels ─────────────────────────────────────────────── -->
+  <g font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, monospace" font-size="19" fill="#3F7A66" letter-spacing="1.4">
+    <text x="56" y="58">1 — ONE PAYMENT</text>
+    <text x="440" y="58">2 — EVEN SPLIT</text>
+    <text x="824" y="58">3 — BALANCE MOVES</text>
+  </g>
+  <g stroke="#A9E0D3" stroke-width="2.5">
+    <path d="M56 76 H376"/><path d="M440 76 H760"/><path d="M824 76 H1144"/>
+  </g>
+  <g stroke="#FFA69E" stroke-width="5">
+    <path d="M56 76 H100"/><path d="M440 76 H484"/><path d="M824 76 H868"/>
+  </g>
+
+  <!-- ── 1. the transaction ──────────────────────────────────────── -->
+  <g id="payment">
+    <rect x="56" y="100" width="320" height="200" rx="18" fill="#FFFFFF" stroke="#A9E0D3" stroke-width="2.5"/>
+    <text x="80" y="132" font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, monospace" font-size="18" fill="#3F7A66" letter-spacing="1.2">GROUP TRANSACTION</text>
+    <text x="80" y="168" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif" font-size="26" font-weight="600" fill="#0E3D30">Uber to the airport</text>
+    <text x="80" y="222" font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, monospace" font-size="42" font-weight="700" fill="#00774D">$30.00</text>
+    <path d="M80 248 H352" stroke="#A9E0D3" stroke-width="2.5"/>
+    <text x="80" y="278" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif" font-size="20" fill="#3F7A66">paid by Ana</text>
+  </g>
+
+  <!-- ── 2. the split ────────────────────────────────────────────── -->
+  <g id="split">
+    <g fill="#FFFFFF" stroke="#A9E0D3" stroke-width="2.5">
+      <rect x="440" y="100" width="320" height="60" rx="14"/>
+      <rect x="440" y="170" width="320" height="60" rx="14"/>
+      <rect x="440" y="240" width="320" height="60" rx="14"/>
+    </g>
+    <g fill="#DDFFF7" stroke="#A9E0D3" stroke-width="2.5">
+      <circle cx="472" cy="130" r="18"/><circle cx="472" cy="200" r="18"/><circle cx="472" cy="270" r="18"/>
+    </g>
+    <g font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, monospace" font-size="18" font-weight="700" fill="#00774D" text-anchor="middle">
+      <text x="472" y="137">A</text><text x="472" y="207">B</text><text x="472" y="277">C</text>
+    </g>
+    <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif" font-size="22" fill="#0E3D30">
+      <text x="504" y="138">Ana</text><text x="504" y="208">Ben</text><text x="504" y="278">Cass</text>
+    </g>
+    <g font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, monospace" font-size="22" fill="#0E3D30" text-anchor="end">
+      <text x="736" y="138">10.00</text><text x="736" y="208">10.00</text><text x="736" y="278">10.00</text>
+    </g>
+    <text x="440" y="332" font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, monospace" font-size="19" fill="#3F7A66">30.00 ÷ 3 parties</text>
+  </g>
+
+  <!-- ── 3. the resulting balances ───────────────────────────────── -->
+  <g id="balances">
+    <g fill="#FFFFFF" stroke="#A9E0D3" stroke-width="2.5">
+      <rect x="824" y="100" width="320" height="60" rx="14"/>
+      <rect x="824" y="170" width="320" height="60" rx="14"/>
+      <rect x="824" y="240" width="320" height="60" rx="14"/>
+    </g>
+    <g fill="#DDFFF7" stroke="#A9E0D3" stroke-width="2.5">
+      <circle cx="856" cy="130" r="18"/><circle cx="856" cy="200" r="18"/><circle cx="856" cy="270" r="18"/>
+    </g>
+    <g font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, monospace" font-size="18" font-weight="700" fill="#00774D" text-anchor="middle">
+      <text x="856" y="137">A</text><text x="856" y="207">B</text><text x="856" y="277">C</text>
+    </g>
+    <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif" font-size="22" fill="#0E3D30">
+      <text x="888" y="138">Ana</text><text x="888" y="208">Ben</text><text x="888" y="278">Cass</text>
+    </g>
+    <rect x="1010" y="114" width="110" height="32" rx="10" fill="#93E1D8" stroke="#00774D" stroke-width="2.5"/>
+    <rect x="1010" y="184" width="110" height="32" rx="10" fill="#FFA69E" stroke="#752B24" stroke-width="2.5"/>
+    <rect x="1010" y="254" width="110" height="32" rx="10" fill="#FFA69E" stroke="#752B24" stroke-width="2.5"/>
+    <g font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, monospace" font-size="21" font-weight="700" text-anchor="middle">
+      <text x="1065" y="137" fill="#00774D">+20.00</text>
+      <text x="1065" y="207" fill="#752B24">−10.00</text>
+      <text x="1065" y="277" fill="#752B24">−10.00</text>
+    </g>
+    <text x="824" y="332" font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, monospace" font-size="19" fill="#3F7A66">stored per user</text>
+  </g>
+
+  <!-- ── flow between the three steps ────────────────────────────── -->
+  <g stroke="#00774D" stroke-width="2.5" fill="#00774D">
+    <path d="M382 200 H424"/><path d="M424 192 L438 200 L424 208 Z" stroke="none"/>
+    <path d="M766 200 H808"/><path d="M808 192 L822 200 L808 208 Z" stroke="none"/>
+  </g>
+
+  <!-- ── the rule the whole app runs on ──────────────────────────── -->
+  <path d="M56 358 H1144" stroke="#A9E0D3" stroke-width="2.5"/>
+  <text x="56" y="396" font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, monospace" font-size="20" fill="#00774D">balance = sum(deposits) − sum(withdrawals)  ·  over completed transactions only</text>
+</svg>

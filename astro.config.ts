@@ -36,12 +36,23 @@ export default defineConfig({
 	integrations: [
 		AstroPWA({
 			registerType: "autoUpdate",
-			includeAssets: ["favicon.svg", "robots.txt"],
+			includeAssets: [
+				"favicon.svg",
+				"favicon.ico",
+				"apple-touch-icon.png",
+				"robots.txt",
+			],
 			manifest: {
 				name: "lets-talie",
 				short_name: "lets-talie",
 				description: "A self-hosted expense tracking and group transaction app",
 				theme_color: "#ffffff",
+				// Brand mint, so the launch splash doesn't frame the icon in white.
+				background_color: "#ddfff7",
+				// Regenerated from logo/logo.svg by `bun run assets:icons`.
+				// The 1024px entries exist because Android scales the largest
+				// icon it can find up to the launcher/splash size — without them
+				// the installed icon is visibly soft on 3x/4x screens.
 				icons: [
 					{
 						src: "pwa-192x192.png",
@@ -56,8 +67,26 @@ export default defineConfig({
 						purpose: "any",
 					},
 					{
+						src: "pwa-1024x1024.png",
+						sizes: "1024x1024",
+						type: "image/png",
+						purpose: "any",
+					},
+					{
+						src: "pwa-maskable-192x192.png",
+						sizes: "192x192",
+						type: "image/png",
+						purpose: "maskable",
+					},
+					{
 						src: "pwa-maskable-512x512.png",
 						sizes: "512x512",
+						type: "image/png",
+						purpose: "maskable",
+					},
+					{
+						src: "pwa-maskable-1024x1024.png",
+						sizes: "1024x1024",
 						type: "image/png",
 						purpose: "maskable",
 					},

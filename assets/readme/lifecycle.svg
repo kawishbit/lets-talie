@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="312" viewBox="0 0 1200 312"
+     role="img" aria-labelledby="life-title life-desc">
+  <title id="life-title">Transaction lifecycle</title>
+  <desc id="life-desc">A member logs a transaction, it waits in the approval queue, an admin approves it, and only then do balances update. Transactions logged by an admin are approved on save and skip the queue. A rejected transaction leaves balances untouched.</desc>
+
+  <rect x="1.5" y="1.5" width="1197" height="309" rx="26" fill="#DDFFF7" stroke="#00774D" stroke-width="3"/>
+
+  <text x="56" y="46" font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, monospace" font-size="19" fill="#3F7A66" letter-spacing="1.4">TRANSACTION LIFECYCLE</text>
+  <path d="M56 60 H100" stroke="#FFA69E" stroke-width="5"/>
+
+  <!-- ── the admin bypass ────────────────────────────────────────── -->
+  <g fill="none" stroke="#00774D" stroke-width="2.5">
+    <path d="M174 164 C174 124 190 108 236 108 H964 C1010 108 1026 124 1026 164"/>
+  </g>
+  <path d="M1018 150 L1026 166 L1034 150 Z" fill="#00774D"/>
+  <rect x="424" y="92" width="352" height="32" fill="#DDFFF7"/>
+  <text x="600" y="115" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, monospace" font-size="19" fill="#00774D" letter-spacing="1.2">ADMIN · APPROVED ON SAVE</text>
+
+  <!-- ── the default path ────────────────────────────────────────── -->
+  <g stroke-width="2.5">
+    <rect x="56"  y="164" width="236" height="72" rx="16" fill="#FFFFFF" stroke="#A9E0D3"/>
+    <rect x="340" y="164" width="236" height="72" rx="16" fill="#DDFFF7" stroke="#7FC9B8" stroke-dasharray="8 6"/>
+    <rect x="624" y="164" width="236" height="72" rx="16" fill="#FFFFFF" stroke="#A9E0D3"/>
+    <rect x="908" y="164" width="236" height="72" rx="16" fill="#00774D" stroke="#00774D"/>
+  </g>
+
+  <g font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, monospace" font-size="17" letter-spacing="1.1">
+    <text x="78"  y="194" fill="#3F7A66">1 · LOGGED</text>
+    <text x="362" y="194" fill="#2F6B58">2 · PENDING</text>
+    <text x="646" y="194" fill="#3F7A66">3 · REVIEWED</text>
+    <text x="930" y="194" fill="#FFA69E">4 · COMPLETED</text>
+  </g>
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif" font-size="22" font-weight="600">
+    <text x="78"  y="222" fill="#0E3D30">Member adds it</text>
+    <text x="362" y="222" fill="#2F6B58">Approval queue</text>
+    <text x="646" y="222" fill="#0E3D30">Admin approves</text>
+    <text x="930" y="222" fill="#DDFFF7">Balances update</text>
+  </g>
+
+  <g stroke="#00774D" stroke-width="2.5" fill="#00774D">
+    <path d="M296 200 H322"/><path d="M322 192 L338 200 L322 208 Z" stroke="none"/>
+    <path d="M580 200 H606"/><path d="M606 192 L622 200 L606 208 Z" stroke="none"/>
+    <path d="M864 200 H890"/><path d="M890 192 L906 200 L890 208 Z" stroke="none"/>
+  </g>
+
+  <!-- ── the other outcome ───────────────────────────────────────── -->
+  <path d="M742 236 V264" stroke="#8FCBBC" stroke-width="2.5" stroke-dasharray="6 6"/>
+  <text x="742" y="288" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, monospace" font-size="18" fill="#3F7A66">rejected · balances untouched</text>
+</svg>

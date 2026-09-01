@@ -18,7 +18,8 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": false,
+		"includes": ["**", "!logo", "!public/*.svg", "!assets"]
 	},
 	"formatter": {
 		"enabled": true,
