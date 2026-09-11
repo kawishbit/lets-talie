@@ -35,7 +35,10 @@ export default defineConfig({
 	},
 	integrations: [
 		AstroPWA({
-			registerType: "autoUpdate",
+			// Prompt (not autoUpdate): a waiting SW stays inactive until the
+			// user clicks Update in UpdatePrompt.vue, so mid-form work is not
+			// wiped by a silent reload after a deploy.
+			registerType: "prompt",
 			includeAssets: [
 				"favicon.svg",
 				"favicon.ico",

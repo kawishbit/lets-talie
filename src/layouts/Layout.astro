@@ -1,6 +1,8 @@
 ---
+import { pwaInfo } from "virtual:pwa-info";
 import "../styles/global.css";
 import AppHeader from "../components/AppHeader.astro";
+import UpdatePrompt from "../components/UpdatePrompt.vue";
 
 interface Props {
 	title?: string;
@@ -25,8 +27,14 @@ const pathname = new URL(Astro.request.url).pathname;
 		     to a scaled page screenshot for the home-screen icon. -->
 		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 		<meta name="apple-mobile-web-app-title" content="lets-talie">
+		<meta name="theme-color" content="#ffffff">
 		<meta name="generator" content={Astro.generator}>
 		<title>{pageTitle}</title>
+		{pwaInfo ? (
+			<Fragment set:html={pwaInfo.webManifest.linkTag} />
+		) : (
+			<link rel="manifest" href="/manifest.webmanifest" />
+		)}
 		<script is:inline>
 			// Apply saved theme before CSS loads to prevent flash
 			(() => {
@@ -47,5 +55,7 @@ const pathname = new URL(Astro.request.url).pathname;
 		<main>
 			<slot />
 		</main>
+		<!-- client:only keeps virtual:pwa-register off the SSR path (navigator) -->
+		<UpdatePrompt client:only="vue" />
 	</body>
 </html>
